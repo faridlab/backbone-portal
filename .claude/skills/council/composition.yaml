@@ -1,0 +1,80 @@
+# composition.yaml
+# Maps (repo_type + scope) -> a council roster.
+# Roster = standing (always) + context (auto by repo type) + invited (conditional).
+# To support a NEW repo type later, add a block under `contexts:` — nothing else changes.
+
+# --- Always seated, every run -------------------------------------------------
+standing:
+  - chair            # synthesizes; adjudicates, does not average
+  - skeptic          # hunts the load-bearing unquestioned assumption
+  - steelman         # builds the strongest honest case before critique
+  - yagni-business   # "what pain does this remove THIS month, at the scale we actually have?"
+
+# --- Run these three as isolated Claude Code subagents ------------------------
+subagent_seats:
+  - skeptic
+  - steelman
+  - chair
+
+# --- Context seats, auto-selected by repo type --------------------------------
+contexts:
+
+  cli:               # metaphor-cli, schema generator, agent runners
+    default_focus: developer-experience
+    seats:
+      - dx-ergonomics
+      - codegen-pragmatist
+      - framework-author
+
+  framework:         # backbone-* skeletons
+    default_focus: adoption-without-author
+    seats:
+      - framework-author
+      - api-extensibility
+      - versioning-discipline
+
+  module:            # backbone-sapiens, backbone-bucket, ...
+    default_focus: bounded-context-cleanliness
+    seats:
+      - ddd-bounded-context
+      - contract-seat            # the contracts this module exposes to siblings
+    invite:
+      - persona: domain-expert
+        when: "the module encodes real-world domain rules (not pure plumbing)"
+
+  root:              # invoked at the metaphor monorepo root
+    default_focus: coherence
+    seats:
+      - systems-interaction      # judges the SEAMS (sapiens x bucket), not any single unit
+      - codegen-pragmatist
+      - platform-engineer        # "can a second person adopt this WITHOUT the author?"
+      - strategist               # leverage vs over-build vs BERSIHir's actual stage
+    invite:
+      - persona: domain-expert
+        when: "one specific service/domain dominates the root discussion"
+
+  service:           # bersihir-service, BERSIHir mobile app, ...
+    default_focus: ops-ux-security-readiness
+    seats:
+      - clean-architecture
+      - operational-realist
+    invite:
+      - persona: domain-expert
+        when: always                      # uses metaphor.toml `domain`
+      - persona: tester
+        when: always
+      - persona: ux
+        when: "a user-facing surface is present (mobile app, admin webapp)"
+      - persona: devopssec
+        when: "an external attack surface or a data/tenant boundary is present"
+
+# --- Allowed focus lenses (Step 2). Pick exactly one per run. -----------------
+focus_lenses:
+  - coherence                 # do the pieces form one system or many disconnected ideas?
+  - leverage                  # where is the real DX/time payoff, and where is it imaginary?
+  - pruning                   # what should be deleted / not built (YAGNI at the system level)?
+  - adoption-without-author   # could someone other than Farid ship with this, unaided?
+  - maturity                  # graded on the RIGHT bar per repo type (see persona maturity_axis)
+  - ops-ux-security-readiness # would this survive real users, real ops, real attackers?
+  - bounded-context-cleanliness
+  - developer-experience

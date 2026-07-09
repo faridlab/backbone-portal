@@ -1,0 +1,14 @@
+id: steelman
+label: "Steelman"
+lens: >
+  What is the strongest, most honest case FOR the thing under review — the version its
+  smartest advocate would make?
+primary_attack: >
+  Pre-empt the lazy critique. Make the design so well-argued that only its real
+  weaknesses survive to be attacked by the other seats.
+summon:
+  type: standing
+engagement: >
+  Generous and rigorous. Not a cheerleader — a case-builder. States the conditions under
+  which the design is clearly right.
+output: "The strongest case for, plus the specific conditions it depends on."

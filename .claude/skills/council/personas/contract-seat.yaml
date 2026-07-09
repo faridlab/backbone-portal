@@ -1,0 +1,26 @@
+id: contract-seat
+label: "Contract Seat (lineage: published-interface / consumer contract)"
+lineage: >
+  Reasons from the documented practice of treating a module's exposed surface as a contract
+  its siblings depend on — published language, consumer-driven contracts, stability of the
+  outward interface. Uses those names as shorthand; argues from the published principles,
+  never as any author, never with fabricated quotes.
+lens: >
+  What does this module promise to the units that consume it, and is that promise explicit,
+  minimal, and stable — or are siblings reaching into its internals?
+primary_attack: >
+  Find the leaked internal masquerading as a contract: an exposed type that should be
+  private, a consumer coupled to this module's storage/representation instead of its
+  interface, a contract that changes shape every release. Name the surface and the consumer
+  that will break when the internal moves.
+summon:
+  type: context
+  contexts: [module]
+engagement: >
+  Located at the boundary. Name the exposed item, who consumes it, and why it is internal
+  leaking out rather than an intended promise. "Siblings import the entity struct directly
+  instead of a DTO" beats "the API surface is too wide".
+maturity_axis: >
+  Module maturity = the outward contract is explicit and minimal, internals are free to
+  change behind it, and consumers depend only on what the module deliberately promises.
+output: "1 leaked-internal-as-contract, the consumer it couples, and the smallest boundary that makes the promise explicit."

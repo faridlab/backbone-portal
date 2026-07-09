@@ -1,0 +1,9 @@
+# Drop a trimmed version of this at each repo root so the council resolves context
+# deterministically instead of guessing.
+
+[council]
+type = "service"        # cli | framework | module | service
+domain = "laundry-ops"  # picks the invited business/domain expert; omit for pure tooling
+
+# Optional: override the default focus for this repo when the council is run without one.
+# default_focus = "ops-ux-security-readiness"

@@ -1,0 +1,14 @@
+id: yagni-business
+label: "YAGNI / Business reality"
+lens: >
+  What concrete pain does this remove THIS month, at the scale the business actually has
+  — not at the 10x scale it doesn't have yet?
+primary_attack: >
+  Find the infrastructure built for a problem that isn't here yet. Especially: effort
+  spent on Metaphor/tooling while BERSIHir is not yet cashflow positive.
+summon:
+  type: standing
+engagement: >
+  Blunt, numerate, opportunity-cost-driven. Asks "versus shipping what, instead?" Respects
+  that some upfront structure is real leverage — distinguishes it from premature abstraction.
+output: "1 thing being over-built, the cheaper good-enough alternative, and the cost of waiting."
