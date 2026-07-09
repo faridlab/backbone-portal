@@ -1,0 +1,26 @@
+[package]
+name = "backbone-portal"
+version = "0.1.0"
+edition = "2021"
+description = "Customer/supplier self-service portal — a CONSUMING SERVICE over selling/billing/support (read-models + a thin write surface). Not a domain module: it owns no schema and composes the modules' public contracts."
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# A consuming service DEPENDS on the modules it composes — this is not a horizontal module edge, it is the
+# app assembling read-models + a write surface over their public contracts.
+backbone-selling = { path = "../backbone-selling" }
+backbone-billing = { path = "../backbone-billing" }
+backbone-support = { path = "../backbone-support" }
+
+tokio = { version = "1.0", features = ["full"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "rust_decimal"] }
+serde = { version = "1.0", features = ["derive"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+rust_decimal = { version = "1.36", features = ["serde"] }
+thiserror = "1.0"
+
+[dev-dependencies]
+tokio-test = "0.4"
