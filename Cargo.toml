@@ -1,6 +1,6 @@
 [package]
 name = "backbone-portal"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Customer/supplier self-service portal — a CONSUMING SERVICE over selling/billing/support (read-models + a thin write surface). Not a domain module: it owns no schema and composes the modules' public contracts."
 
