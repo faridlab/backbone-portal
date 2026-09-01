@@ -1,0 +1,125 @@
+# =============================================================================
+# portal Module - Schema Index
+# =============================================================================
+# Version: 2.0
+# Description: Module schema index. `module:` and `schema:` are stamped from
+# the module name. `schema: portal` gives this module its OWN Postgres schema
+# (migrations emit `CREATE SCHEMA portal` and qualify tables as
+# `portal.<table>`) — the convention every backbone module follows (see
+# backbone-sapiens, backbone-survey). Do not remove it.
+#
+# Enum types are created UNQUALIFIED in the `public` schema (the module
+# convention, ratified). The four names below were census-checked against
+# every module migration in the tree before landing (zero exact or stem
+# collisions; nearest neighbors pos_portal_* / survey_input_state /
+# mfa_session_status are all distinct from the portal_* stems).
+# =============================================================================
+
+module: portal
+version: 2
+schema: portal
+description: "portal — the customer self-service identity module: portal principals with an expiring rotatable bearer credential plus an independent per-recipient HMAC (ADR-0018 Tier A, the PI-01 token-scheme split), invitation-only access with a kill-switchable signup policy default OFF, the PI-04 per-document field-whitelist verb, mint audit, and a sapiens lifecycle subscription that revokes access and invalidates tokens when the linked identity dies (Odoo portal port)"
+
+# ADR-0014 company fence: the upstream Odoo portal addon ships ZERO ir.rules
+# — access control is 100% controller-level (the cycle-27 census; the spec
+# tree's own README says so). The port declares that posture honestly as
+# `none`: no company column, no company RLS policy. The portal's security
+# axis is the capability model (Tier A bearer + recipient HMAC) plus
+# ownership-scoped service-layer reads — a different axis from the company
+# fence, exactly the posture-4 shape ADR-0014 names. Tenant isolation
+# (ADR-0006) remains the only fence. Which company's documents a portal
+# principal may see is decided by the family-side read models (the owning
+# modules' own fences apply there); this module owns principals and
+# credentials, not documents.
+company_fence: none
+
+config:
+  database: postgresql
+  soft_delete: true
+  audit: true
+  default_timestamps: true
+  generators:
+    disabled:
+      - graphql
+      - grpc
+      - proto
+
+# Sapiens owns password credentials and the user lifecycle. The portal
+# references sapiens users by LOGICAL ref only (no DB constraint — the
+# lifecycle link arrives on the integration bus, and a cross-module FK would
+# couple migration trees this module deliberately keeps separate).
+external_imports:
+  - module: sapiens
+    types: [User]
+
+# Shared value-object types available to all models in this module.
+shared_types:
+  Timestamps:
+    created_at:
+      type: datetime
+      attributes: ["@default(now)"]
+      description: "Record creation timestamp"
+    updated_at:
+      type: datetime
+      attributes: ["@updated_at"]
+      description: "Last update timestamp"
+    deleted_at:
+      type: datetime?
+      description: "Soft delete timestamp"
+
+  Actors:
+    created_by:
+      type: uuid?
+      attributes: ["@foreign_key(sapiens.User.id)"]
+      description: "User who created this record"
+    updated_by:
+      type: uuid?
+      attributes: ["@foreign_key(sapiens.User.id)"]
+      description: "User who last updated this record"
+    deleted_by:
+      type: uuid?
+      attributes: ["@foreign_key(sapiens.User.id)"]
+      description: "User who deleted this record"
+
+  Metadata: [Timestamps, Actors]
+
+# Import each entity model (informational — discovery is a recursive glob,
+# but keeping the list accurate helps readers).
+imports:
+  - portal_user.model.yaml
+  - portal_invite.model.yaml
+  - portal_token.model.yaml
+  - portal_signup_policy.model.yaml
+  - portal_audit_log.model.yaml
+
+# =============================================================================
+# FLAG-ID COVERAGE — the cycle-27 port decisions this module closes (spec
+# tree: docs/odoo/foundation/portal-auth/):
+#
+# PI-01 (one column, two schemes, never rotates)  → SPLIT into two
+#   independent Tier A credentials: the expiring rotatable BEARER
+#   (portal_tokens; nonce selector + exp + MAC, rotation = fresh nonce
+#   atomically — the survey attempt machinery) and the per-recipient HMAC
+#   (stateless, domain-separated — the digest unsubscribe machinery). The
+#   HMAC input does NOT cover the bearer; either rotates independently.
+# PI-02 (?pid=&hash= HMAC keyed db secret)         → the per-recipient HMAC
+#   above, keyed by its own PORTAL_RECIPIENT_TOKEN_SECRET.
+# PI-03 (SUPERUSER browse + consteq, never-rotating uuid) → declared
+#   ownership-scoped read models + explicit verbs (the PortalDocumentSurface
+#   trait) — scoped SQL, no sudo-browse-then-filter.
+# PI-04 (12-field frontend write allowlist)        → the typed
+#   PortalDetailPatch whitelist (11 fields after collapsing the upstream
+#   zip/zipcode redundancy); unknown fields cannot even be expressed.
+# PI-09/PI-18 (signup as install-time bootstrap / auto-b2c flip) → a
+#   declared kill-switchable policy surface, DEFAULT OFF, zero install-time
+#   bootstrap (no seed row; absent row reads as CLOSED).
+# PI-07 (grant race, python-only email uniqueness) → unique-on-live email
+#   via a partial unique index (the hand hardening migration) — the DB is
+#   the fence, not a search.
+# PI-21/PI-23 (login enumeration, stolen-token posture) → uniform de-oracled
+#   refusals on every auth verb; the bearer expires + rotates; the
+#   credential check is delegated through a fail-closed port so the
+#   unknown-vs-wrong distinction is not this module's to leak.
+# The remaining PI census rows map to sapiens behavior / WB-3 / fenced —
+# the O-2 threat-notes doc (workspace) carries the full map.
+# =============================================================================

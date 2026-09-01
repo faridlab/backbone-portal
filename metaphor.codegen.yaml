@@ -1,0 +1,77 @@
+# Codegen policy for portal.
+#
+# `user_owned` globs are hand-written files that live inside generator-owned
+# trees but are NOT schema-derived. `metaphor schema generate [--force]`
+# skips them wholesale (never reads, merges, or deletes them). Everything
+# else in src/ is regenerated from schema/models.
+#
+# Re-exports/declarations that must sit alongside generated code live inside
+# `// <<< CUSTOM ... // END CUSTOM` markers (lib.rs, application/service/
+# mod.rs) and are preserved by the marker mechanism, not listed here.
+#
+# Declared BEFORE any file lands (the regen-safety contract): a landing
+# without the declaration is clobbered on the next regen; a declaration
+# without the file is the dangling class removed by review — later seats
+# extend this list on the same contract, declaring each hand file in the
+# same change that lands it.
+
+user_owned:
+  # The module's typed error surface (one enum, HTTP mappings) — shared by
+  # every hand service below.
+  - "src/application/service/portal_error.rs"
+
+  # The TWO independent Tier A credentials (ADR-0018 / the PI-01 split):
+  # the expiring rotatable bearer (nonce selector + MAC over
+  # (id, nonce, grant, exp), atomic rotation) and the stateless
+  # per-recipient HMAC (domain-separated, its own secret, input never
+  # covers the bearer) — plus mint audit and the Tier B verify-failure
+  # book.
+  - "src/application/service/token_service.rs"
+
+  # Invitation lifecycle: mint (Tier A capability link), the explicit
+  # revocation list, one-shot redemption (the conditional-UPDATE fence).
+  - "src/application/service/invite_service.rs"
+
+  # The kill-switchable signup policy: fail-closed read (absent row =
+  # CLOSED), the guarded set verb, zero install-time bootstrap.
+  - "src/application/service/policy_service.rs"
+
+  # The principal access verbs: login (through the fail-closed credential
+  # port), policy-gated signup, lifecycle revocation sweeps.
+  - "src/application/service/access_service.rs"
+
+  # The fail-closed credential seam: the module owns the trait + the
+  # refusing default; the composing host registers the verifier (sapiens
+  # owns the password hashes). Unwired = loud NotComposed refusal.
+  - "src/application/service/credential_port.rs"
+
+  # The sapiens lifecycle subscription: sapiens.user.created onboarding +
+  # deactivate/delete revocation + token invalidation (registered by the
+  # HOST on its integration bus — the digest user_created precedent).
+  - "src/application/service/lifecycle_handler.rs"
+
+  # The PUBLIC trait surface — the named artifact WB-3/WB-4/W8 consume:
+  # ownership-scoped read models + the per-document PI-04 field-whitelist
+  # verb, as an exported trait contract (not route handlers).
+  - "src/application/service/portal_surface.rs"
+
+  # The gated public auth tree (invite redemption, login, rotation, me,
+  # policy-gated signup) with Tier B per-identity+IP throttling and
+  # uniform de-oracled refusals. The module does NOT self-mount this —
+  # the host mounts it behind its gates at /api/v1/portal.
+  - "src/presentation/http/public_routes.rs"
+
+  # Hand-written DB hardening: the unique-on-live email partial unique
+  # index (the PI-07 grant-race fence — the DB, not a search).
+  - "migrations/*hardening*"
+
+  # Hand-authored module documentation (root docs; the retired
+  # consuming-service docs/ tree was removed with the skeleton).
+  - "README.md"
+  - "SPEC.md"
+
+  # The fail-hard probe suite (fresh scratch DB per test; a missing
+  # scratch Postgres panics the suite rather than skipping) — including
+  # the MANDATORY customer-isolation probe class ported from the
+  # consuming-service predecessor (tests/portal_isolation.rs).
+  - "tests/**"

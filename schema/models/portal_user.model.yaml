@@ -1,0 +1,145 @@
+# =============================================================================
+# portal — the identity home: PortalUser (the portal principal).
+#
+# PORT DECISIONS (source: docs/odoo/foundation/portal-auth — cycle 27):
+#  - The identity home is PORTAL-OWNED (the W7 identity-home ruling): who a
+#    portal principal is, their access state, and their portal credentials
+#    live here — NOT in sapiens' organization tables. Password verification
+#    is delegated through a fail-closed port (sapiens owns the hashes); the
+#    lifecycle mirror arrives on the integration bus (sapiens.user.created /
+#    .deactivated / .deleted) and stamps `sapiens_user_id` + revocations.
+#  - Read-only over HTTP (`read_only: true`): every write goes through the
+#    typed verbs (invite redemption, the PI-04 detail patch, the lifecycle
+#    revocation). Generic mutation would bypass the status machine and the
+#    field whitelist.
+#  - The address block carries the PI-04 11-field shape (the upstream
+#    12-field allowlist with zip/zipcode collapsed to one `zip` column —
+#    the redundancy was upstream noise, recorded here). These columns are
+#    writable ONLY through the update_my_details verb; the typed patch
+#    struct IS the whitelist.
+#  - `status` is HAND-SET (invited -> active; revocation edges from the
+#    archive/delete/login-kill triggers and the lifecycle subscription).
+#    A revoked principal's every credential refuses — status is checked at
+#    bearer verification, not just at login.
+# =============================================================================
+
+models:
+
+  - name: PortalUser
+    collection: portal_users
+    read_only: true
+    description: "Portal User — THE PRINCIPAL (the identity home). One row per portal self-service identity: email unique among live rows (partial unique index — the DB fence for the PI-07 grant race), the PI-04 address block (writable only through the typed detail verb), the hand-set invited/active/revoked/archived status, and the logical sapiens lifecycle link. Read-only over HTTP: rows are created only through invite redemption or the policy-gated signup verb, and revoked by the lifecycle subscription / officer verbs."
+    fields:
+      id:
+        type: uuid
+        attributes: ["@id", "@default(uuid)"]
+        description: "Unique record id (the principal id every public surface — WB-3 website users, WB-4 events, W8 storefront — keys on)"
+      email:
+        type: string
+        attributes: ["@required", "@max(320)", "@indexed"]
+        description: "The principal's email — the login identity. UNIQUE among live rows (the hand hardening migration's partial unique index, the PI-07 fix: the DB is the fence, not a check-then-insert search). Stored trimmed + lowercased by the service layer."
+      display_name:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "Human-facing name (the PI-04 `name` field — one of the whitelisted detail columns)."
+      status:
+        type: PortalUserStatus
+        attributes: ["@required", "@default(invited)"]
+        lifecycle:
+          shape: hand_set
+          # NOTE: no `state_machine:` ref — deliberate, recorded. DECLARATION
+          # OF RECORD for the machine `portal_user_status` (this block):
+          # invited -> active (invite redemption / policy-gated signup),
+          # active -> revoked (login-kill, lifecycle deactivate/delete,
+          # officer verb), active|invited -> archived (archive trigger).
+          # Re-activation is a NEW invitation, never an edge back — a
+          # revoked principal's history stays.
+        description: "THE access state — hand-set through the verbs + the lifecycle subscription; checked at EVERY bearer verification (a revoked principal's live-looking tokens refuse)."
+
+      # ---- the PI-04 address block (per-verb writable whitelist) -----------
+      phone:
+        type: string?
+        attributes: ["@max(40)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.phone)."
+      street:
+        type: string?
+        attributes: ["@max(160)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.street)."
+      street2:
+        type: string?
+        attributes: ["@max(160)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.street2)."
+      city:
+        type: string?
+        attributes: ["@max(80)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.city)."
+      state_id:
+        type: string?
+        attributes: ["@max(80)", "@exclude_from_foreign_key_check"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.state_id) — carried as the state's stable code string (no geo module edge from this crate; the webapp resolves labels)."
+      country_id:
+        type: string?
+        attributes: ["@max(8)", "@exclude_from_foreign_key_check"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.country_id) — carried as the ISO-3166 alpha-2 code (same no-edge rule as state_id)."
+      zip:
+        type: string?
+        attributes: ["@max(24)"]
+        description: "PI-04 whitelisted detail field — upstream carried BOTH zip and zipcode as separate allowlist entries (pure redundancy); the port collapses them into this ONE column and records the collapse."
+      vat:
+        type: string?
+        attributes: ["@max(40)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.vat)."
+      company_name:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "PI-04 whitelisted detail field (upstream res.partner.company_name — the customer's own company label, not a tenancy ref)."
+
+      # ---- the lifecycle mirror + revocation record -------------------------
+      sapiens_user_id:
+        type: uuid?
+        attributes: ["@indexed", "@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref sapiens.User.id (no DB constraint — cross-module migration independence). Stamped at invite redemption when the recipient authenticates against sapiens credentials, and by the sapiens.user.created onboarding arm when a pending invite matches the new user's email. The deactivate/delete lifecycle arms key on this link."
+      revoked_at:
+        type: datetime?
+        description: "Stamped when status -> revoked (never cleared — re-access is a new invitation)."
+      revocation_reason:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "Why access was revoked (officer verb reason / lifecycle event type / login-kill)."
+      archived_at:
+        type: datetime?
+        description: "Stamped when status -> archived (the archive trigger — data retained, access dead)."
+      last_login_at:
+        type: datetime?
+        description: "Best-effort login touch (observation only — it gates nothing; the bearer + status are the gates)."
+
+      metadata:
+        type: Metadata
+        attributes: ["@audit_metadata"]
+        description: "Audit metadata"
+
+    indexes:
+      - type: index
+        fields: [status]
+        description: "The live-principal scans (redemption, bearer checks join on status)"
+      - type: index
+        fields: [sapiens_user_id]
+        description: "The lifecycle subscription's lookup arm"
+
+# =============================================================================
+# Enums (identity cluster)
+# =============================================================================
+
+enums:
+  - name: PortalUserStatus
+    description: "THE principal access state — hand-set (declaration of record in the status field's lifecycle block); checked at every bearer verification"
+    variants:
+      - name: invited
+        description: "Redeemed an invitation / created by the policy-gated signup — not yet active (the transition edge is the first login or the onboarding completion)"
+        default: true
+      - name: active
+        description: "Full portal access — bearers verify"
+      - name: revoked
+        description: "Access dead (login-kill, officer verb, or the sapiens deactivate/delete lifecycle arm); every credential refuses; re-access = a NEW invitation"
+      - name: archived
+        description: "Data retained, access dead (the archive trigger — GDPR-style soft retirement)"

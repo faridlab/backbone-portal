@@ -1,0 +1,43 @@
+# =============================================================================
+# portal — the kill-switch: PortalSignupPolicy (open signup as an explicit,
+# switchable policy surface; DEFAULT OFF; zero install-time bootstrap).
+#
+# PORT DECISIONS (source: docs/odoo/foundation/portal-auth — cycle 27,
+# PI-09/PI-18): upstream's auth_signup flips b2c signup on at INSTALL time
+# and the website family carries DB-wide b2c installs — neither ports. The
+# port ships signup as a declared policy row that is OFF by default and is
+# read FAIL-CLOSED: NO row (the shipped state — no seed migration inserts
+# one) reads as CLOSED exactly like enabled=false. An officer flips it
+# through the guarded verb; the flip and every refusal against a closed
+# policy are audited. Per-website opt-in is reserved for W8 (recorded in
+# the SPEC); this row is the service-wide switch.
+# =============================================================================
+
+models:
+
+  - name: PortalSignupPolicy
+    collection: portal_signup_policies
+    read_only: true
+    description: "Portal Signup Policy — the kill-switchable open-signup surface (PI-09/PI-18). A single logical row: absent row OR enabled=false reads as CLOSED (fail-closed; zero install-time bootstrap — nothing seeds this table); the guarded set verb flips it and audits the flip. Self-service signup is NOT the shipped access path — invitation is."
+    fields:
+      id:
+        type: uuid
+        attributes: ["@id", "@default(uuid)"]
+        description: "Unique record id"
+      enabled:
+        type: boolean
+        attributes: ["@required", "@default(false)"]
+        description: "DEFAULT OFF — the shipped posture. True only while an officer has deliberately opened self-service signup; the officer can kill it again at any moment (the kill-switch) and every in-flight signup attempt after the flip refuses."
+      note:
+        type: string?
+        attributes: ["@max(200)"]
+        description: "Why the switch was flipped (the audit trail's human context — recorded by the set verb)."
+      updated_by:
+        type: uuid?
+        attributes: ["@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref sapiens.User.id — the officer who last flipped the switch."
+
+      metadata:
+        type: Metadata
+        attributes: ["@audit_metadata"]
+        description: "Audit metadata"

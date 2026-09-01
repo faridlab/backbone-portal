@@ -1,0 +1,102 @@
+# =============================================================================
+# portal — the mint/revocation audit trail: PortalAuditLog.
+#
+# PORT DECISIONS: none of the composed Tier A precedents (engagement
+# rating, survey attempt, digest unsubscribe) carries an explicit audit ROW
+# — their audit is tracing only. The PI-01 split's rotation/revocation
+# posture needs better than logs: every credential mint, rotation,
+# revocation, redemption, policy flip, and closed-policy signup refusal
+# lands here as a durable row (the W7-C4 mint-audit requirement). Rows are
+# append-only by construction (read-only over HTTP; the services only
+# INSERT).
+# =============================================================================
+
+models:
+
+  - name: PortalAuditLog
+    collection: portal_audit_log
+    read_only: true
+    description: "Portal Audit Log — the durable mint/revocation trail. Append-only: every invite mint/redeem/revoke, bearer mint/rotate/revoke, recipient-HMAC mint, signup refusal/creation, policy flip, login outcome, and lifecycle revocation lands as one row. The principal's own access-history read model serves a filtered view of it."
+    fields:
+      id:
+        type: uuid
+        attributes: ["@id", "@default(uuid)"]
+        description: "Unique record id"
+      event:
+        type: PortalAuditEvent
+        attributes: ["@required", "@indexed"]
+        description: "WHAT happened — the closed enum (one row shape per security-relevant edge)."
+      portal_user_id:
+        type: uuid?
+        attributes: ["@indexed", "@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref PortalUser.id — the principal the event concerns (nullable: invite mints precede any principal)."
+      invite_id:
+        type: uuid?
+        attributes: ["@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref PortalInvite.id — the invite concerned, when any."
+      token_id:
+        type: uuid?
+        attributes: ["@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref PortalToken.id — the bearer concerned, when any."
+      actor:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "WHO performed it — officer identity, 'recipient', 'lifecycle:<event-type>', or 'system' (a free-form audit label, not an auth identity)."
+      detail:
+        type: json?
+        description: "Structured context (reasons, envelope ids, correlation ids) — facts only; credential material is NEVER written here."
+      occurred_at:
+        type: datetime
+        attributes: ["@required", "@default(now)"]
+        description: "When the edge happened."
+
+      metadata:
+        type: Metadata
+        attributes: ["@audit_metadata"]
+        description: "Audit metadata"
+
+    indexes:
+      - type: index
+        fields: [portal_user_id, event]
+        description: "The per-principal access-history read model's leading arm"
+      - type: index
+        fields: [event, occurred_at]
+        description: "The officer's security review scans (all mints / all revocations in a window)"
+
+enums:
+  - name: PortalAuditEvent
+    description: "The closed vocabulary of security-relevant portal edges (one row shape per edge; credential material never lands in the row)"
+    variants:
+      - name: invite_minted
+        description: "An invitation capability was minted (officer verb)."
+        default: true
+      - name: invite_revoked
+        description: "An invitation was revoked (officer verb / principal trigger / lifecycle)."
+      - name: invite_redeemed
+        description: "An invitation was redeemed — a principal was created."
+      - name: signup_refused_policy_closed
+        description: "A self-service signup was refused because the policy is closed (the default posture)."
+      - name: signup_created
+        description: "A self-service signup created a principal (policy open)."
+      - name: policy_changed
+        description: "The signup kill-switch was flipped."
+      - name: bearer_minted
+        description: "A bearer credential was minted (redemption / signup / login)."
+      - name: bearer_rotated
+        description: "A bearer credential was rotated (fresh nonce + expiry; the old one died)."
+      - name: bearer_revoked
+        description: "A bearer credential was revoked (officer / login-kill / lifecycle)."
+      - name: recipient_hmac_minted
+        description: "A per-recipient HMAC capability was minted (the stateless credential's mint audit)."
+      - name: login_succeeded
+        description: "A login verified (via the credential port)."
+      - name: login_refused
+        description: "A login was refused (uniform body — the row records the fact, never which half failed)."
+      - name: lifecycle_access_revoked
+        description: "The sapiens lifecycle subscription revoked a principal + invalidated their credentials."
+      - name: onboarding_linked
+        description: "The sapiens.user.created onboarding arm linked a new sapiens user to a pending invite."
+      - name: onboarding_no_invitation
+        description: "A sapiens.user.created arrived with no pending invite — the audited non-action (never a silent skip)."
+      - name: credential_port_not_composed
+        description: "An auth verb refused loudly because the host wired no credential verifier (fail-closed port)."

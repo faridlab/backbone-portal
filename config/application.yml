@@ -1,0 +1,78 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+  grpc_port: 50051
+database:
+  url: postgresql://root:password@localhost:5432/skeletondb
+  max_connections: 10
+  min_connections: 5
+  connect_timeout: 30
+  idle_timeout: 600
+logging:
+  level: info
+  format: json
+  file: logs/portal.log
+jobs: {}
+portal:
+  bearer_token:
+    ttl_hours: 24
+  invite_token:
+    ttl_days: 14
+  recipient_hmac:
+    ttl_days: 180
+  login_throttle:
+    max_failures: 5
+    base_seconds: 30
+    cap_seconds: 900
+    min_spacing_seconds: 1
+module:
+  name: portal
+  enabled: true
+features:
+  soft_delete: true
+  state_machines: true
+  workflows: false
+entities:
+  portal_user:
+    collection: portal_users
+    enabled: true
+    cache_ttl: 0
+    pagination:
+      default_limit: 50
+      max_limit: 500
+  portal_invite:
+    collection: portal_invites
+    enabled: true
+    cache_ttl: 0
+    pagination:
+      default_limit: 50
+      max_limit: 500
+  portal_token:
+    collection: portal_tokens
+    enabled: true
+    cache_ttl: 0
+    pagination:
+      default_limit: 100
+      max_limit: 1000
+  portal_signup_policy:
+    collection: portal_signup_policies
+    enabled: true
+    cache_ttl: 0
+    pagination:
+      default_limit: 5
+      max_limit: 10
+  portal_audit_log:
+    collection: portal_audit_log
+    enabled: true
+    cache_ttl: 0
+    pagination:
+      default_limit: 100
+      max_limit: 1000
+tracing:
+  enabled: true
+  exporter: otlp
+  endpoint: http://localhost:4317
+metrics:
+  enabled: true
+  endpoint: /metrics
+  port: 9090

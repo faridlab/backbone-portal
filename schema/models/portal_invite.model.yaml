@@ -1,0 +1,100 @@
+# =============================================================================
+# portal — the invitation capability: PortalInvite (a Tier A capability with
+# an explicit revocation record).
+#
+# PORT DECISIONS (source: docs/odoo/foundation/portal-auth — cycle 27):
+#  - Invitation-only is the SHIPPED access path (the signup policy default
+#    OFF); an invite IS a Tier A capability (ADR-0018): the mailed link
+#    carries {invite_id}.{nonce}.{exp}.{mac}, the MAC HMAC-SHA256 over
+#    (id, nonce, grant, exp) with grant "portal_invite:{recipient_email}" —
+#    the engagement rating / survey attempt machinery. The nonce is a
+#    SELECTOR, not the capability: a leaked row alone is inert.
+#  - The revocation list is EXPLICIT and row-level (status + revoked_at +
+#    revocation_reason): revoking an invite is an officer verb and a
+#    lifecycle trigger (archive/delete/login-kill on the linked principal
+#    revokes their outstanding invites). No ambient expiry sweep is needed
+#    for safety — expired invites refuse at verify (shared refusal body,
+#    no oracle) — but the audit row records the edge.
+#  - Read-only over HTTP: invites are minted/revoked only through the verbs.
+# =============================================================================
+
+models:
+
+  - name: PortalInvite
+    collection: portal_invites
+    read_only: true
+    description: "Portal Invite — the invitation capability (Tier A, ADR-0018). One row per issued invitation: the recipient email, the nonce selector + mandatory expiry of the capability, the pending/redeemed/revoked/expired status, and the explicit revocation record. Read-only over HTTP: minted by the officer invite verb, revoked by the officer verb + the lifecycle/archive/delete triggers, redeemed exactly once by the public redemption verb."
+    fields:
+      id:
+        type: uuid
+        attributes: ["@id", "@default(uuid)"]
+        description: "Unique record id (the link's first component)"
+      recipient_email:
+        type: string
+        attributes: ["@required", "@max(320)", "@indexed"]
+        description: "The invited email — the grant binds to it (MAC grant 'portal_invite:{recipient_email}'), so a link forwarded to another mailbox refuses at redemption (the email in the link and the email presenting it must agree)."
+      token_nonce:
+        type: string
+        attributes: ["@required", "@max(64)", "@indexed"]
+        description: "128-bit hex SELECTOR of the invitation capability — the public link carries {invite_id}.{nonce}.{exp}.{mac}; the nonce alone is not the capability. UNIQUE among all rows (rotation/re-mint issues a fresh nonce on a NEW row; a re-invite never reuses a selector)."
+      token_expires_at:
+        type: datetime
+        attributes: ["@required"]
+        description: "MANDATORY expiry (ADR-0018 Tier A) — stamped at mint (config TTL), refused after with the SAME shared body as every other invitation refusal (no oracle)."
+      status:
+        type: PortalInviteStatus
+        attributes: ["@required", "@default(pending)"]
+        lifecycle:
+          shape: hand_set
+          # NOTE: no `state_machine:` ref — deliberate, recorded. DECLARATION
+          # OF RECORD for the machine `portal_invite_status` (this block):
+          # pending -> redeemed (the one-shot redemption verb), pending ->
+          # revoked (officer verb + the archive/delete/login-kill triggers
+          # on the linked principal), pending -> expired (the sweep verb /
+          # lazy refusal). No edges back.
+        description: "THE invitation lifecycle — hand-set through the verbs + triggers; every terminal state refuses redemption with the same body."
+      granted_by:
+        type: uuid?
+        attributes: ["@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref sapiens.User.id — the officer who minted the invite (audit trail)."
+      redeemed_by:
+        type: uuid?
+        attributes: ["@indexed", "@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref PortalUser.id — the principal the redemption created (stamped exactly once; the unique-redemption fence is the conditional UPDATE)."
+      redeemed_at:
+        type: datetime?
+        description: "When redemption happened (audit + the PI-07 race fence: the conditional UPDATE stamps it atomically)."
+      revoked_at:
+        type: datetime?
+        description: "When the invite was revoked (the explicit revocation record)."
+      revocation_reason:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "Why (officer reason / trigger name / lifecycle event type)."
+
+      metadata:
+        type: Metadata
+        attributes: ["@audit_metadata"]
+        description: "Audit metadata"
+
+    indexes:
+      - type: index
+        fields: [recipient_email, status]
+        description: "The onboarding arm's lookup (pending invite by email)"
+      - type: unique
+        fields: [token_nonce]
+        description: "A selector is never reused — uniqueness is absolute, not live-only"
+
+enums:
+  - name: PortalInviteStatus
+    description: "THE invitation lifecycle — hand-set (declaration of record in the status field's lifecycle block)"
+    variants:
+      - name: pending
+        description: "Minted, not yet redeemed — the only state the redemption verb accepts"
+        default: true
+      - name: redeemed
+        description: "Consumed exactly once — the principal exists; the link is dead"
+      - name: revoked
+        description: "Explicitly killed before redemption (officer verb / principal trigger / lifecycle)"
+      - name: expired
+        description: "Past token_expires_at at sweep or refusal — the link is dead"

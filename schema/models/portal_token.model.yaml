@@ -1,0 +1,107 @@
+# =============================================================================
+# portal — the bearer credential store: PortalToken (credential ONE of the
+# PI-01 split; the per-recipient HMAC — credential two — is STATELESS, the
+# digest-unsubscribe machinery, and stores no row).
+#
+# PORT DECISIONS (source: docs/odoo/foundation/portal-auth — cycle 27):
+#  - The BEARER is the survey-attempt machinery, adapted to a principal
+#    session: the presented credential carries
+#    {token_id}.{nonce}.{exp}.{mac}, MAC HMAC-SHA256 over
+#    (id, nonce, grant, exp) with grant "portal_bearer:{user_id}". The MAC
+#    is recomputed over the STORED row fields at verify — a forged
+#    nonce/exp cannot ride a valid id. MULTI-USE within its life; rotation
+#    mints a fresh nonce + expiry atomically and the old nonce dies with
+#    the UPDATE.
+#  - Only a HASH-equivalent lives server-side: the row stores the nonce
+#    SELECTOR + expiry + status — never the MAC (recomputable) and never a
+#    plaintext secret. A leaked database row is inert without the module
+#    secret.
+#  - The principal's status is checked at EVERY verification — a revoked or
+#    archived principal's live-looking tokens refuse.
+#  - Read-only over HTTP: tokens are minted/rotated/revoked only through
+#    the verbs + the lifecycle subscription.
+# =============================================================================
+
+models:
+
+  - name: PortalToken
+    collection: portal_tokens
+    read_only: true
+    description: "Portal Token — the expiring rotatable BEARER credential (Tier A, ADR-0018; one of the two independent PI-01-split credentials). One row per issued bearer: the owning principal, the nonce selector + mandatory expiry, the active/rotated/revoked status, and the rotation/revocation record. The per-recipient HMAC credential is deliberately NOT a row here — independence means it never touches this table."
+    fields:
+      id:
+        type: uuid
+        attributes: ["@id", "@default(uuid)"]
+        description: "Unique record id (the credential's first component)"
+      user_id:
+        type: uuid
+        attributes: ["@required", "@indexed", "@foreign_key(PortalUser.portal_users)"]
+        description: "The owning principal (relation-driven FK, ON DELETE CASCADE — a hard-deleted principal's tokens die with the row)."
+      token_nonce:
+        type: string
+        attributes: ["@required", "@max(64)", "@indexed"]
+        description: "128-bit hex SELECTOR of the bearer — rotation mints a fresh one atomically; UNIQUE across all rows (a selector is never reused, live or dead)."
+      token_expires_at:
+        type: datetime
+        attributes: ["@required"]
+        description: "MANDATORY expiry (ADR-0018 Tier A) — re-stamped on every rotation; expired bearers refuse with the shared body (no oracle)."
+      status:
+        type: PortalTokenStatus
+        attributes: ["@required", "@default(active)"]
+        lifecycle:
+          shape: hand_set
+          # NOTE: no `state_machine:` ref — deliberate, recorded. DECLARATION
+          # OF RECORD for the machine `portal_token_status` (this block):
+          # active -> rotated (the rotation verb stamps rotated_at + the
+          # successor id), active -> revoked (officer verb, login-kill,
+          # lifecycle deactivate/delete). No edges back — a rotated or
+          # revoked credential is dead forever.
+        description: "THE credential lifecycle — hand-set through the verbs + the lifecycle subscription; only status=active verifies."
+      rotated_at:
+        type: datetime?
+        description: "Stamped by the rotation verb (the old row's death certificate)."
+      rotated_to:
+        type: uuid?
+        attributes: ["@exclude_from_foreign_key_check"]
+        description: "LOGICAL ref PortalToken.id — the successor credential minted by the rotation (the audit chain)."
+      revoked_at:
+        type: datetime?
+        description: "Stamped when revoked (login-kill / officer / lifecycle)."
+      revocation_reason:
+        type: string?
+        attributes: ["@max(120)"]
+        description: "Why the credential died."
+      last_used_at:
+        type: datetime?
+        description: "Best-effort verify touch (observation; gates nothing)."
+
+      metadata:
+        type: Metadata
+        attributes: ["@audit_metadata"]
+        description: "Audit metadata"
+
+    relations:
+      user:
+        type: PortalUser
+        attributes: ["@one", "@foreign_key(user_id)", "@on_delete(cascade)"]
+        description: "The owning principal (real FK portal.portal_tokens.user_id -> portal.portal_users, cascade)"
+
+    indexes:
+      - type: unique
+        fields: [token_nonce]
+        description: "A selector is never reused — uniqueness is absolute, not live-only"
+      - type: index
+        fields: [user_id, status]
+        description: "The live-credential scans (verify joins, lifecycle invalidation sweeps)"
+
+enums:
+  - name: PortalTokenStatus
+    description: "THE bearer lifecycle — hand-set (declaration of record in the status field's lifecycle block)"
+    variants:
+      - name: active
+        description: "Verifiable — multi-use within its life"
+        default: true
+      - name: rotated
+        description: "Superseded by a fresh nonce (the rotation verb) — dead forever"
+      - name: revoked
+        description: "Killed (officer verb, login-kill, or the sapiens deactivate/delete lifecycle arm) — dead forever"

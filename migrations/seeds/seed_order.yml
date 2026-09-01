@@ -1,0 +1,14 @@
+# Seed Execution Order Configuration
+# Seeds are executed in the order defined in this file.
+# This ensures foreign key dependencies are satisfied.
+
+# Format: seed_name_seed (without .sql extension)
+#
+# Note: You can manually edit this file to customize the order.
+# Seeds not listed here will be executed after in alphabetical order.
+
+- portal_audit_log_seed
+- portal_invite_seed
+- portal_signup_policy_seed
+- portal_token_seed
+- portal_user_seed

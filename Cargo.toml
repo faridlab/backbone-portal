@@ -1,26 +1,91 @@
 [package]
 name = "backbone-portal"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
-description = "Customer/supplier self-service portal — a CONSUMING SERVICE over selling/billing/support (read-models + a thin write surface). Not a domain module: it owns no schema and composes the modules' public contracts."
+description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
 
 [lib]
 path = "src/lib.rs"
 
 [dependencies]
-# A consuming service DEPENDS on the modules it composes — this is not a horizontal module edge, it is the
-# app assembling read-models + a write surface over their public contracts.
-backbone-selling = { path = "../backbone-selling" }
-backbone-billing = { path = "../backbone-billing" }
-backbone-support = { path = "../backbone-support" }
+# -----------------------------------------------------------------------------
+# Backbone Framework crates
+#
+# Pulled directly from the public framework repository so this module works
+# anywhere on disk without path fix-up. Pinned to the framework tag current
+# at the retire-and-new (single-rev policy: every framework source in the
+# resolved graph resolves to this one tag).
+# -----------------------------------------------------------------------------
+backbone-core = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.11", features = ["postgres"] }
+backbone-orm = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.11" }
+backbone-auth = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.11" }
+backbone-messaging = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.11" }
+# The gated public auth family is throttled per identity AND per IP at the
+# route composer (ADR-0018 Tier B on every verification endpoint).
+backbone-rate-limit = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.11" }
 
+# Sibling module — THE ONLY module edge. Sapiens owns the user lifecycle
+# this module subscribes to: its exported event structs (UserCreatedEvent /
+# UserDeletedEvent at v0.2.5) are the declared contract the lifecycle
+# subscription is written against, and its users are the identity source
+# behind the fail-closed credential port. Pinned tag-equal like every
+# sibling dep (the digest->mail precedent).
+backbone-sapiens = { git = "https://github.com/faridlab/backbone-sapiens", tag = "v0.2.5" }
+
+# Sibling modules NOT consumed by design — recorded here so no later seat
+# adds them casually:
+#  - backbone-selling / backbone-billing / backbone-support (and the whole
+#    sales graph): the v0.1.x consuming-service shape died with the
+#    retire-and-new. Consumer read models over those tables are
+#    family-side/host-side compositions, never module edges from here.
+#  - any website-family module: the website boundary is its own upstream
+#    module; it consumes THIS module's exported trait surface, not the
+#    reverse.
+
+# Core async runtime and serialization
 tokio = { version = "1.0", features = ["full"] }
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "rust_decimal"] }
+async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
-rust_decimal = { version = "1.36", features = ["serde"] }
+
+# Database (PostgreSQL primary)
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json", "migrate"] }
+
+# HTTP framework (Axum)
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Logging
+tracing = "0.1"
+
+# Validation
+validator = { version = "0.16", features = ["derive"] }
+
+# The TWO independent Tier A credentials (ADR-0018 / PI-01 split): the
+# bearer's nonce selector + HMAC-SHA256 MAC over (id, nonce, grant, exp),
+# and the per-recipient HMAC with its own secret — the module's only crypto
+# surface.
+hmac = "0.12"
+sha2 = "0.10"
+rand = "0.8"
+
+# Error handling
+anyhow = "1.0"
 thiserror = "1.0"
 
+# Configuration
+config = "0.14"
+serde_yaml = "0.9"
+
 [dev-dependencies]
+tempfile = "3.0"
 tokio-test = "0.4"
+pretty_assertions = "1.0"
+
+# Integration testing framework — router probes drive the gated public
+# surface in-process via tower's ServiceExt::oneshot.
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+jsonwebtoken = "9.3"
