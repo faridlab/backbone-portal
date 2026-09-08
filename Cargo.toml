@@ -16,13 +16,13 @@ path = "src/lib.rs"
 # at the retire-and-new (single-rev policy: every framework source in the
 # resolved graph resolves to this one tag).
 # -----------------------------------------------------------------------------
-backbone-core = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.15", features = ["postgres"] }
-backbone-orm = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.15" }
-backbone-auth = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.15" }
-backbone-messaging = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.15" }
+backbone-core = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.16", features = ["postgres"] }
+backbone-orm = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.16" }
+backbone-auth = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.16" }
+backbone-messaging = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.16" }
 # The gated public auth family is throttled per identity AND per IP at the
 # route composer (ADR-0018 Tier B on every verification endpoint).
-backbone-rate-limit = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.15" }
+backbone-rate-limit = { git = "https://github.com/faridlab/backbone-framework", tag = "v2.7.16" }
 
 # Sibling module — THE ONLY module edge. Sapiens owns the user lifecycle
 # this module subscribes to: its exported event structs (UserCreatedEvent /
@@ -30,7 +30,7 @@ backbone-rate-limit = { git = "https://github.com/faridlab/backbone-framework", 
 # subscription is written against, and its users are the identity source
 # behind the fail-closed credential port. Pinned tag-equal like every
 # sibling dep (the digest->mail precedent).
-backbone-sapiens = { git = "https://github.com/faridlab/backbone-sapiens", tag = "v0.2.6" }
+backbone-sapiens = { git = "https://github.com/faridlab/backbone-sapiens", tag = "v0.2.7" }
 
 # Sibling modules NOT consumed by design — recorded here so no later seat
 # adds them casually:
