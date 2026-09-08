@@ -1,6 +1,6 @@
 ---
 name: grouped-commits
-description: Commit working-tree changes split into focused commits grouped by functionality — small related files together, large files on their own — each with a one-line message that states WHY the change was made. Use this skill whenever asked to commit, stage, or split changes into commits. Never append a co-author, "Generated with", or any signature line. Never use a filler message that carries no context (no "update", "fix stuff", "changes", "wip").
+description: Commit working-tree changes split into focused commits grouped by functionality — small related files together, large files on their own — each with a one-line message that states WHY the change was made. Use this skill whenever asked to commit, stage, or split changes into commits. Never append a co-author, "Generated with", or any signature line. Never use a filler message that carries no context (no "update", "fix stuff", "changes", "wip"). Messages must be self-contained and timeless: no sprint/wave/pass labels, internal spec IDs, or session scorekeeping ("W1 P5", "H-7", "44/44 matrix") — a reader next year must understand the message without this week's planning context.
 ---
 
 # Grouped Commits
@@ -33,6 +33,14 @@ large file separately and reference its purpose in its own message.
 - **No meaningless words without context.** Words like *update, fix, change, improve, refactor* are
   only allowed when followed by the specific thing and the reason. "update deps" is banned;
   "update axum to 0.7 for the graceful-shutdown API" is fine.
+- **Self-contained and timeless.** The message must decode on its own, a year from now, for a
+  reader with no access to this conversation or this week's planning docs — another engineer, a
+  fresh session, you. No sprint/wave/pass labels ("W1 P5"), internal spec IDs ("H-7"),
+  council/meeting references, or scorekeeping counts ("44/44 matrix"). That vocabulary lives in
+  the planning document that defines it, never in the commit that describes the change: name what
+  the change is and why it matters, in words that stay true later.
+  - ✅ `docs: record payroll composition complete — statutory parameter tables, per-day overtime pricing, fence fix`
+  - ❌ `docs: record W1 P5 complete — 44/44 matrix, council report`
 - **Imperative mood, lower-case start, no trailing period.** Match the repo's existing log style if
   it differs — run `git log --oneline -10` first and follow the prevailing convention.
 
@@ -88,6 +96,8 @@ that says why it changed.
 - A large generated file mixed in with a small hand-written change, hiding the real diff.
 - Splitting so finely that a single logical change spans many commits no one can follow.
 - Messages that name the file or say "update/fix/wip" without the why.
+- Session or plan jargon in a message — `record W1 P5 complete — 44/44 matrix` decodes only
+  inside the planning conversation that coined it; next year it means nothing.
 - Any signature, co-author, or "generated with" line.
 
 ## Related skills
