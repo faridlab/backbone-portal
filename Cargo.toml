@@ -1,6 +1,6 @@
 [package]
 name = "backbone-portal"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
 
