@@ -1,0 +1,30 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "0be0ffb10fb34858b5ec0014d3a4564a.yAMRQjmb8c2AgHni",
+    "ANTHROPIC_MODEL": "glm-5.2",
+    "ANTHROPIC_SMALL_FAST_MODEL": "glm-5.2-air"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/faridlab/.local/bin/graphify hook-guard search"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/faridlab/.local/bin/graphify hook-guard read"
+          }
+        ]
+      }
+    ]
+  }
+}
