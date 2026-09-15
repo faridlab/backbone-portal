@@ -4,7 +4,6 @@
 //!
 //! Uses backbone-orm's `DatabaseOperations<T>` trait.
 
-mod portal_audit_log_repository;
 mod portal_invite_repository;
 mod portal_signup_policy_repository;
 mod portal_token_repository;
@@ -15,7 +14,6 @@ mod portal_user_repository;
 // END CUSTOM
 
 // Re-exports
-pub use portal_audit_log_repository::PortalAuditLogRepository;
 pub use portal_invite_repository::PortalInviteRepository;
 pub use portal_signup_policy_repository::PortalSignupPolicyRepository;
 pub use portal_token_repository::PortalTokenRepository;

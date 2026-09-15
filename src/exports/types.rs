@@ -11,66 +11,6 @@ use chrono::{DateTime, Utc};
 use crate::domain::entity::*;
 
 // ============================================================================
-// PORTALAUDITLOG TYPES
-// ============================================================================
-
-/// Type-safe ID for PortalAuditLog
-///
-/// Use this instead of raw Uuid for type safety across modules.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct PortalAuditLogId(pub Uuid);
-
-impl PortalAuditLogId {
-    pub fn new(id: Uuid) -> Self {
-        Self(id)
-    }
-
-    pub fn into_inner(self) -> Uuid {
-        self.0
-    }
-}
-
-impl From<Uuid> for PortalAuditLogId {
-    fn from(id: Uuid) -> Self {
-        Self(id)
-    }
-}
-
-impl From<PortalAuditLogId> for Uuid {
-    fn from(id: PortalAuditLogId) -> Self {
-        id.0
-    }
-}
-
-/// Data transfer object for PortalAuditLog
-///
-/// This is the public representation of PortalAuditLog for other modules.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogDto {
-    pub id: PortalAuditLogId,
-    pub event: PortalAuditEvent,
-    pub portal_user_id: Option<Uuid>,
-    pub invite_id: Option<Uuid>,
-    pub token_id: Option<Uuid>,
-    pub actor: Option<String>,
-    pub detail: Option<serde_json::Value>,
-    pub occurred_at: DateTime<Utc>,
-    pub metadata: serde_json::Value,
-}
-
-/// Summary view of PortalAuditLog for list displays
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogSummary {
-    pub id: PortalAuditLogId,
-}
-
-/// Reference to PortalAuditLog for foreign key relationships
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogRef {
-    pub id: PortalAuditLogId,
-}
-
-// ============================================================================
 // PORTALINVITE TYPES
 // ============================================================================
 

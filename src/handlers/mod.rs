@@ -9,7 +9,6 @@
 use std::sync::Arc;
 
 // Import all services
-use crate::application::service::PortalAuditLogService;
 use crate::application::service::PortalInviteService;
 use crate::application::service::PortalSignupPolicyService;
 use crate::application::service::PortalTokenService;
@@ -33,8 +32,6 @@ use crate::application::service::PortalUserService;
 /// ```
 #[derive(Clone)]
 pub struct AppState {
-    /// PortalAuditLog service
-    pub portal_audit_log_service: Arc<PortalAuditLogService>,
     /// PortalInvite service
     pub portal_invite_service: Arc<PortalInviteService>,
     /// PortalSignupPolicy service
@@ -48,14 +45,12 @@ pub struct AppState {
 impl AppState {
     /// Create a new AppState with all services.
     pub fn new(
-        portal_audit_log_service: Arc<PortalAuditLogService>,
         portal_invite_service: Arc<PortalInviteService>,
         portal_signup_policy_service: Arc<PortalSignupPolicyService>,
         portal_token_service: Arc<PortalTokenService>,
         portal_user_service: Arc<PortalUserService>
     ) -> Self {
         Self {
-            portal_audit_log_service,
             portal_invite_service,
             portal_signup_policy_service,
             portal_token_service,
@@ -66,7 +61,6 @@ impl AppState {
     /// Create AppState from module instance.
     pub fn from_module(module: &crate::PortalModule) -> Self {
         Self {
-            portal_audit_log_service: module.portal_audit_log_service.clone(),
             portal_invite_service: module.portal_invite_service.clone(),
             portal_signup_policy_service: module.portal_signup_policy_service.clone(),
             portal_token_service: module.portal_token_service.clone(),
@@ -80,7 +74,6 @@ impl AppState {
 /// Allows incremental construction of AppState.
 #[derive(Default)]
 pub struct AppStateBuilder {
-    portal_audit_log_service: Option<Arc<PortalAuditLogService>>,
     portal_invite_service: Option<Arc<PortalInviteService>>,
     portal_signup_policy_service: Option<Arc<PortalSignupPolicyService>>,
     portal_token_service: Option<Arc<PortalTokenService>>,
@@ -91,12 +84,6 @@ impl AppStateBuilder {
     /// Create a new builder.
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// Set the PortalAuditLog service.
-    pub fn with_portal_audit_log_service(mut self, service: Arc<PortalAuditLogService>) -> Self {
-        self.portal_audit_log_service = Some(service);
-        self
     }
 
     /// Set the PortalInvite service.
@@ -130,7 +117,6 @@ impl AppStateBuilder {
     /// Panics if any required service is not set.
     pub fn build(self) -> AppState {
         AppState {
-            portal_audit_log_service: self.portal_audit_log_service.expect("portal_audit_log_service is required"),
             portal_invite_service: self.portal_invite_service.expect("portal_invite_service is required"),
             portal_signup_policy_service: self.portal_signup_policy_service.expect("portal_signup_policy_service is required"),
             portal_token_service: self.portal_token_service.expect("portal_token_service is required"),

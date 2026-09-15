@@ -16,6 +16,10 @@
 # same change that lands it.
 
 user_owned:
+  # The shared-audit-trail funnel (hand-written; replaces this module's
+  # retired per-module audit table).
+  - "src/application/service/audit.rs"
+
   # The module's typed error surface (one enum, HTTP mappings) — shared by
   # every hand service below.
   - "src/application/service/portal_error.rs"

@@ -6,19 +6,12 @@
 //! Implementations should be in the infrastructure layer.
 
 
-pub mod portal_audit_log_repository;
 pub mod portal_invite_repository;
 pub mod portal_signup_policy_repository;
 pub mod portal_token_repository;
 pub mod portal_user_repository;
 
 // Re-exports
-pub use portal_audit_log_repository::{
-    PortalAuditLogRepository,
-    PortalAuditLogPaginationParams,
-    PortalAuditLogPaginatedResult,
-    PortalAuditLogFilter,
-};
 pub use portal_invite_repository::{
     PortalInviteRepository,
     PortalInvitePaginationParams,

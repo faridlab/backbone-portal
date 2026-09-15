@@ -8,7 +8,7 @@
 //! ## Usage from other modules
 //!
 //! ```text
-//! use portal::exports::{PortalAuditLogDto};
+//! use portal::exports::{PortalInviteDto};
 //! ```
 
 mod types;
@@ -27,9 +27,6 @@ pub use events::*;
 /// Summary of what this module exports
 ///
 /// ## Public Types
-/// - `PortalAuditLogDto` - Data transfer object for PortalAuditLog
-/// - `PortalAuditLogSummary` - Summary view of PortalAuditLog
-/// - `PortalAuditLogId` - Type-safe ID wrapper
 /// - `PortalInviteDto` - Data transfer object for PortalInvite
 /// - `PortalInviteSummary` - Summary view of PortalInvite
 /// - `PortalInviteId` - Type-safe ID wrapper
@@ -44,9 +41,6 @@ pub use events::*;
 /// - `PortalUserId` - Type-safe ID wrapper
 ///
 /// ## Public Events
-/// - `PortalAuditLogCreatedEvent` - Published when PortalAuditLog is created
-/// - `PortalAuditLogUpdatedEvent` - Published when PortalAuditLog is updated
-/// - `PortalAuditLogDeletedEvent` - Published when PortalAuditLog is deleted
 /// - `PortalInviteCreatedEvent` - Published when PortalInvite is created
 /// - `PortalInviteUpdatedEvent` - Published when PortalInvite is updated
 /// - `PortalInviteDeletedEvent` - Published when PortalInvite is deleted

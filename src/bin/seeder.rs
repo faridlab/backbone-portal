@@ -12,7 +12,6 @@ use sqlx::postgres::PgPoolOptions;
 use std::env;
 
 // Import seeders
-use backbone_portal::seeders::SeedPortalAuditLogSeeder;
 use backbone_portal::seeders::SeedPortalInviteSeeder;
 use backbone_portal::seeders::SeedPortalSignupPolicySeeder;
 use backbone_portal::seeders::SeedPortalTokenSeeder;
@@ -45,7 +44,6 @@ async fn main() -> Result<()> {
 
     // Register seeders in order
     let mut seeders: Vec<Box<dyn Seeder + Send + Sync>> = Vec::new();
-    seeders.push(Box::new(SeedPortalAuditLogSeeder::new()));
     seeders.push(Box::new(SeedPortalInviteSeeder::new()));
     seeders.push(Box::new(SeedPortalSignupPolicySeeder::new()));
     seeders.push(Box::new(SeedPortalTokenSeeder::new()));

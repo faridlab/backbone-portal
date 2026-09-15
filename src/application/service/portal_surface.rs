@@ -343,13 +343,18 @@ impl PortalDocumentSurface for PgPortalSurface {
         limit: i64,
     ) -> Result<Vec<PortalAccessEvent>, PortalError> {
         let limit = limit.clamp(1, 100);
+        // Reads the shared audit trail the writes now land on. The subject is
+        // keyed the way the writer keys it — `portal.portal_users` plus the
+        // principal's id — and the action vocabulary is unchanged, so the same
+        // five access events are selected by the same names.
         let rows = sqlx::query_as::<_, (String, DateTime<Utc>, Option<String>)>(
-            r#"SELECT event::text, occurred_at, actor
-               FROM portal.portal_audit_log
-               WHERE portal_user_id = $1
-                 AND event IN ('login_succeeded', 'login_refused',
-                               'bearer_minted', 'bearer_rotated',
-                               'bearer_revoked')
+            r#"SELECT action, occurred_at, actor
+               FROM auditlog.audit_trails
+               WHERE subject_type = 'portal.portal_users'
+                 AND subject_id = $1::text
+                 AND action IN ('login_succeeded', 'login_refused',
+                                'bearer_minted', 'bearer_rotated',
+                                'bearer_revoked')
                ORDER BY occurred_at DESC
                LIMIT $2"#,
         )

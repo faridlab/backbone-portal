@@ -4,17 +4,18 @@
 //!
 //! Each entity service is a type alias over `GenericCrudService`.
 
-pub mod audit;
 pub mod error;
 pub use error::{ServiceError, ServiceResult};
 
-pub mod portal_audit_log_service;
 pub mod portal_invite_service;
 pub mod portal_signup_policy_service;
 pub mod portal_token_service;
 pub mod portal_user_service;
 
 // <<< CUSTOM
+// The shared-audit-trail funnel. Inside the markers so a regeneration
+// cannot drop the declaration and leave the file orphaned.
+pub mod audit;
 // Hand-written portal services (user-owned files — see
 // metaphor.codegen.yaml; NOT GenericCrudService aliases).
 pub mod portal_error;
@@ -27,7 +28,6 @@ pub mod lifecycle_handler;
 pub mod portal_surface;
 // END CUSTOM
 
-pub use portal_audit_log_service::PortalAuditLogService;
 pub use portal_invite_service::PortalInviteService;
 pub use portal_signup_policy_service::PortalSignupPolicyService;
 pub use portal_token_service::PortalTokenService;

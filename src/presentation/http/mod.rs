@@ -5,7 +5,6 @@
 //! These handlers use Axum and backbone-core's BackboneCrudHandler
 //! to provide all 12 standard Backbone CRUD endpoints.
 
-pub mod portal_audit_log_handler;
 pub mod portal_invite_handler;
 pub mod portal_signup_policy_handler;
 pub mod portal_token_handler;
@@ -20,7 +19,6 @@ pub use public_routes::{portal_public_routes, PortalPublicState};
 // END CUSTOM
 
 // Re-exports
-pub use portal_audit_log_handler::{create_portal_audit_log_routes, create_portal_audit_log_read_routes, create_portal_audit_log_write_routes};
 pub use portal_invite_handler::{create_portal_invite_routes, create_portal_invite_read_routes, create_portal_invite_write_routes};
 pub use portal_signup_policy_handler::{create_portal_signup_policy_routes, create_portal_signup_policy_read_routes, create_portal_signup_policy_write_routes};
 pub use portal_token_handler::{create_portal_token_routes, create_portal_token_read_routes, create_portal_token_write_routes};

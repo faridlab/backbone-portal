@@ -11,33 +11,6 @@ use chrono::{DateTime, Utc};
 use super::types::*;
 
 // ============================================================================
-// PORTALAUDITLOG EVENTS
-// ============================================================================
-
-/// Event published when a PortalAuditLog is created
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogCreatedEvent {
-    pub id: PortalAuditLogId,
-    pub data: PortalAuditLogDto,
-    pub occurred_at: DateTime<Utc>,
-}
-
-/// Event published when a PortalAuditLog is updated
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogUpdatedEvent {
-    pub id: PortalAuditLogId,
-    pub data: PortalAuditLogDto,
-    pub occurred_at: DateTime<Utc>,
-}
-
-/// Event published when a PortalAuditLog is deleted
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PortalAuditLogDeletedEvent {
-    pub id: PortalAuditLogId,
-    pub occurred_at: DateTime<Utc>,
-}
-
-// ============================================================================
 // PORTALINVITE EVENTS
 // ============================================================================
 
@@ -153,9 +126,6 @@ pub struct PortalUserDeletedEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum PortalEvent {
-    PortalAuditLogCreated(PortalAuditLogCreatedEvent),
-    PortalAuditLogUpdated(PortalAuditLogUpdatedEvent),
-    PortalAuditLogDeleted(PortalAuditLogDeletedEvent),
     PortalInviteCreated(PortalInviteCreatedEvent),
     PortalInviteUpdated(PortalInviteUpdatedEvent),
     PortalInviteDeleted(PortalInviteDeletedEvent),

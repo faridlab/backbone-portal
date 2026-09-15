@@ -88,7 +88,6 @@ imports:
   - portal_invite.model.yaml
   - portal_token.model.yaml
   - portal_signup_policy.model.yaml
-  - portal_audit_log.model.yaml
 
 # =============================================================================
 # FLAG-ID COVERAGE — the cycle-27 port decisions this module closes (spec

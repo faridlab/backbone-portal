@@ -6,7 +6,6 @@
 
 pub use backbone_core::{Specification, AndSpecification, OrSpecification, NotSpecification};
 
-pub mod portal_audit_log_specification;
 pub mod portal_invite_specification;
 pub mod portal_signup_policy_specification;
 pub mod portal_token_specification;

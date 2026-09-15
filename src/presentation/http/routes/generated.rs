@@ -9,7 +9,6 @@ use axum::Router;
 use std::sync::Arc;
 
 use super::{
-    portal_audit_log_handler::create_portal_audit_log_read_routes,
     portal_invite_handler::create_portal_invite_read_routes,
     portal_signup_policy_handler::create_portal_signup_policy_read_routes,
     portal_token_handler::create_portal_token_read_routes,
@@ -17,7 +16,6 @@ use super::{
 };
 
 use crate::application::service::{
-    PortalAuditLogService,
     PortalInviteService,
     PortalSignupPolicyService,
     PortalTokenService,
@@ -26,7 +24,6 @@ use crate::application::service::{
 
 /// Services collection for all CRUD endpoints
 pub struct HttpServices {
-    pub portal_audit_log: Arc<PortalAuditLogService>,
     pub portal_invite: Arc<PortalInviteService>,
     pub portal_signup_policy: Arc<PortalSignupPolicyService>,
     pub portal_token: Arc<PortalTokenService>,
@@ -50,8 +47,6 @@ pub struct HttpServices {
 /// 12. GET /api/v1/{collection}/:id/deleted - Get deleted by ID
 pub fn configure_routes(services: HttpServices) -> Router {
     Router::new()
-        // PortalAuditLog routes (READ-ONLY — append-only/event-sourced entity; writes arrive via the event handlers)
-        .merge(create_portal_audit_log_read_routes(services.portal_audit_log))
         // PortalInvite routes (READ-ONLY — append-only/event-sourced entity; writes arrive via the event handlers)
         .merge(create_portal_invite_read_routes(services.portal_invite))
         // PortalSignupPolicy routes (READ-ONLY — append-only/event-sourced entity; writes arrive via the event handlers)
@@ -65,10 +60,6 @@ pub fn configure_routes(services: HttpServices) -> Router {
 /// Create an individual entity's routes (for modular configuration)
 pub mod individual {
     use super::*;
-
-    pub fn portal_audit_log_routes(service: Arc<PortalAuditLogService>) -> Router {
-        create_portal_audit_log_routes(service)
-    }
 
     pub fn portal_invite_routes(service: Arc<PortalInviteService>) -> Router {
         create_portal_invite_routes(service)

@@ -5,13 +5,11 @@
 pub mod shared_types;
 pub use shared_types::{ValidationError, ValidationErrors, ValidationResult, EntityValidator};
 
-pub mod portal_audit_log_validator;
 pub mod portal_invite_validator;
 pub mod portal_signup_policy_validator;
 pub mod portal_token_validator;
 pub mod portal_user_validator;
 
-pub use portal_audit_log_validator::{PortalAuditLogValidator, portal_audit_log_validator};
 pub use portal_invite_validator::{PortalInviteValidator, portal_invite_validator};
 pub use portal_signup_policy_validator::{PortalSignupPolicyValidator, portal_signup_policy_validator};
 pub use portal_token_validator::{PortalTokenValidator, portal_token_validator};

@@ -32,7 +32,6 @@ pub use domain::entity::*;
 pub use infrastructure::persistence::*;
 
 // Re-exports - Application services
-pub use application::service::PortalAuditLogService;
 pub use application::service::PortalInviteService;
 pub use application::service::PortalSignupPolicyService;
 pub use application::service::PortalTokenService;
@@ -55,7 +54,6 @@ use sqlx::PgPool;
 /// let router = portal.all_crud_routes();
 /// ```
 pub struct PortalModule {
-    pub(crate) portal_audit_log_service: Arc<PortalAuditLogService>,
     pub(crate) portal_invite_service: Arc<PortalInviteService>,
     pub(crate) portal_signup_policy_service: Arc<PortalSignupPolicyService>,
     pub(crate) portal_token_service: Arc<PortalTokenService>,
@@ -77,7 +75,6 @@ impl PortalModule {
     /// real deployment; use this only in trusted/admin/seeding contexts.
     pub fn all_crud_routes(&self) -> Router {
         use presentation::http::{
-            create_portal_audit_log_read_routes,
             create_portal_invite_read_routes,
             create_portal_signup_policy_read_routes,
             create_portal_token_read_routes,
@@ -85,7 +82,6 @@ impl PortalModule {
         };
 
         Router::new()
-            .merge(create_portal_audit_log_read_routes(self.portal_audit_log_service.clone()))
             .merge(create_portal_invite_read_routes(self.portal_invite_service.clone()))
             .merge(create_portal_signup_policy_read_routes(self.portal_signup_policy_service.clone()))
             .merge(create_portal_token_read_routes(self.portal_token_service.clone()))
@@ -109,7 +105,6 @@ impl PortalModule {
     /// merge validated write routes (or a write service's HTTP layer) onto it.
     pub fn readonly_routes(&self) -> Router {
         use presentation::http::{
-            create_portal_audit_log_read_routes,
             create_portal_invite_read_routes,
             create_portal_signup_policy_read_routes,
             create_portal_token_read_routes,
@@ -117,7 +112,6 @@ impl PortalModule {
         };
 
         Router::new()
-            .merge(create_portal_audit_log_read_routes(self.portal_audit_log_service.clone()))
             .merge(create_portal_invite_read_routes(self.portal_invite_service.clone()))
             .merge(create_portal_signup_policy_read_routes(self.portal_signup_policy_service.clone()))
             .merge(create_portal_token_read_routes(self.portal_token_service.clone()))
@@ -155,10 +149,6 @@ impl PortalModuleBuilder {
         let db_pool = self.db_pool
             .ok_or_else(|| anyhow::anyhow!("Database pool not configured"))?;
 
-        // PortalAuditLog service
-        let portal_audit_log_repository = Arc::new(PortalAuditLogRepository::new(db_pool.clone()));
-        let portal_audit_log_service = Arc::new(PortalAuditLogService::with_repository(portal_audit_log_repository.clone()));
-
         // PortalInvite service
         let portal_invite_repository = Arc::new(PortalInviteRepository::new(db_pool.clone()));
         let portal_invite_service = Arc::new(PortalInviteService::with_repository(portal_invite_repository.clone()));
@@ -179,7 +169,6 @@ impl PortalModuleBuilder {
         // END CUSTOM
 
         Ok(PortalModule {
-            portal_audit_log_service,
             portal_invite_service,
             portal_signup_policy_service,
             portal_token_service,

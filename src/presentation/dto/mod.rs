@@ -5,21 +5,12 @@
 //! This module provides DTOs for the presentation layer,
 //! with validation and OpenAPI schema support.
 
-pub mod portal_audit_log_dto;
 pub mod portal_invite_dto;
 pub mod portal_signup_policy_dto;
 pub mod portal_token_dto;
 pub mod portal_user_dto;
 
 // Re-exports
-pub use portal_audit_log_dto::{
-    CreatePortalAuditLogDto,
-    UpdatePortalAuditLogDto,
-    PatchPortalAuditLogDto,
-    PortalAuditLogResponseDto,
-    PortalAuditLogListResponseDto,
-    PortalAuditLogSummaryDto,
-};
 pub use portal_invite_dto::{
     CreatePortalInviteDto,
     UpdatePortalInviteDto,

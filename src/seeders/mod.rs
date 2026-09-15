@@ -9,13 +9,11 @@ use anyhow::Result;
 use async_trait::async_trait;
 use sqlx::PgPool;
 
-mod portal_audit_log_seeder;
 mod portal_invite_seeder;
 mod portal_signup_policy_seeder;
 mod portal_token_seeder;
 mod portal_user_seeder;
 
-pub use portal_audit_log_seeder::SeedPortalAuditLogSeeder;
 pub use portal_invite_seeder::SeedPortalInviteSeeder;
 pub use portal_signup_policy_seeder::SeedPortalSignupPolicySeeder;
 pub use portal_token_seeder::SeedPortalTokenSeeder;
