@@ -1,6 +1,6 @@
 [package]
 name = "backbone-portal"
-version = "0.2.12"
+version = "0.2.13"
 edition = "2021"
 description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
 
@@ -31,7 +31,7 @@ backbone-rate-limit = { git = "https://github.com/faridlab/backbone-framework", 
 # subscription is written against, and its users are the identity source
 # behind the fail-closed credential port. Pinned tag-equal like every
 # sibling dep (the digest->mail precedent).
-backbone-sapiens = { git = "https://github.com/faridlab/backbone-sapiens", tag = "v0.4.7" }
+backbone-sapiens = { git = "https://github.com/faridlab/backbone-sapiens", tag = "v0.4.8" }
 
 # Sibling modules NOT consumed by design — recorded here so no later seat
 # adds them casually:
