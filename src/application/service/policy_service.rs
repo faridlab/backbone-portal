@@ -74,15 +74,15 @@ impl PolicyService {
         .await?;
         tx.commit().await?;
 
-        sqlx::query(
-            r#"INSERT INTO portal.portal_audit_log
-                 (id, event, actor, detail)
-               VALUES ($1, 'policy_changed'::portal_audit_event, $2, $3)"#,
+        crate::application::service::audit::record_audit(
+            &self.pool,
+            "policy_changed",
+            Some(officer.map(|u| u.to_string()).as_deref().unwrap_or("system")),
+            None,
+            None,
+            None,
+            serde_json::json!({ "enabled": enabled, "note": note }),
         )
-        .bind(Uuid::new_v4())
-        .bind(officer.map(|u| u.to_string()).as_deref().unwrap_or("system"))
-        .bind(serde_json::json!({ "enabled": enabled, "note": note }))
-        .execute(&self.pool)
         .await?;
         Ok(())
     }

@@ -61,18 +61,9 @@ impl InviteService {
         actor: &str,
         detail: serde_json::Value,
     ) -> Result<(), PortalError> {
-        sqlx::query(
-            r#"INSERT INTO portal.portal_audit_log
-                 (id, event, portal_user_id, invite_id, actor, detail)
-               VALUES ($1, $2::portal_audit_event, $3, $4, $5, $6)"#,
+        crate::application::service::audit::record_audit(
+            &self.pool, event, Some(actor), user, invite, None, detail,
         )
-        .bind(Uuid::new_v4())
-        .bind(event)
-        .bind(user)
-        .bind(invite)
-        .bind(actor)
-        .bind(detail)
-        .execute(&self.pool)
         .await?;
         Ok(())
     }

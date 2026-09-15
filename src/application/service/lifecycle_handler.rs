@@ -167,19 +167,18 @@ impl SapiensLifecycleHandler {
 
         match linked {
             Some(portal_user_id) => {
-                sqlx::query(
-                    r#"INSERT INTO portal.portal_audit_log
-                         (id, event, portal_user_id, actor, detail)
-                       VALUES ($1, 'onboarding_linked'::portal_audit_event, $2, $3, $4)"#,
+                crate::application::service::audit::record_audit(
+                    &self.pool,
+                    "onboarding_linked",
+                    Some(&format!("lifecycle:{}", envelope.event_type)),
+                    Some(portal_user_id),
+                    None,
+                    None,
+                    serde_json::json!({
+                        "envelope_id": envelope.id,
+                        "sapiens_user_id": sapiens_user,
+                    }),
                 )
-                .bind(Uuid::new_v4())
-                .bind(portal_user_id)
-                .bind(format!("lifecycle:{}", envelope.event_type))
-                .bind(serde_json::json!({
-                    "envelope_id": envelope.id,
-                    "sapiens_user_id": sapiens_user,
-                }))
-                .execute(&self.pool)
                 .await
                 .map_err(|e| EventError::handler(HANDLER, format!("onboarding audit: {e}")))?;
             }
@@ -188,18 +187,18 @@ impl SapiensLifecycleHandler {
                 // non-action (a new employee with no portal presence is
                 // the NORMAL case; the audit row keeps it from being a
                 // silent skip, per the digest growth-loop shape).
-                sqlx::query(
-                    r#"INSERT INTO portal.portal_audit_log
-                         (id, event, actor, detail)
-                       VALUES ($1, 'onboarding_no_invitation'::portal_audit_event, $2, $3)"#,
+                crate::application::service::audit::record_audit(
+                    &self.pool,
+                    "onboarding_no_invitation",
+                    Some(&format!("lifecycle:{}", envelope.event_type)),
+                    None,
+                    None,
+                    None,
+                    serde_json::json!({
+                        "envelope_id": envelope.id,
+                        "sapiens_user_id": sapiens_user,
+                    }),
                 )
-                .bind(Uuid::new_v4())
-                .bind(format!("lifecycle:{}", envelope.event_type))
-                .bind(serde_json::json!({
-                    "envelope_id": envelope.id,
-                    "sapiens_user_id": sapiens_user,
-                }))
-                .execute(&self.pool)
                 .await
                 .map_err(|e| EventError::handler(HANDLER, format!("non-action audit: {e}")))?;
             }
@@ -253,19 +252,18 @@ impl SapiensLifecycleHandler {
             return Ok(());
         }
 
-        sqlx::query(
-            r#"INSERT INTO portal.portal_audit_log
-                 (id, event, portal_user_id, actor, detail)
-               VALUES ($1, 'lifecycle_access_revoked'::portal_audit_event, $2, $3, $4)"#,
+        crate::application::service::audit::record_audit(
+            &self.pool,
+            "lifecycle_access_revoked",
+            Some(&format!("lifecycle:{}", envelope.event_type)),
+            Some(user_id),
+            None,
+            None,
+            serde_json::json!({
+                "envelope_id": envelope.id,
+                "sapiens_user_id": sapiens_user,
+            }),
         )
-        .bind(Uuid::new_v4())
-        .bind(user_id)
-        .bind(format!("lifecycle:{}", envelope.event_type))
-        .bind(serde_json::json!({
-            "envelope_id": envelope.id,
-            "sapiens_user_id": sapiens_user,
-        }))
-        .execute(&self.pool)
         .await
         .map_err(|e| EventError::handler(HANDLER, format!("revocation audit: {e}")))?;
         Ok(())

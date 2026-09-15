@@ -4,6 +4,7 @@
 //!
 //! Each entity service is a type alias over `GenericCrudService`.
 
+pub mod audit;
 pub mod error;
 pub use error::{ServiceError, ServiceResult};
 
