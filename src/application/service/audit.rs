@@ -71,3 +71,35 @@ pub async fn record_audit(
     .await
     .map(|_| ())
 }
+
+/// Stamp one audit row from a verb that holds a pool rather than a transaction.
+///
+/// The shared trail is org-fenced and its guard runs as a BEFORE INSERT
+/// trigger, so it fires first: a row written on a connection carrying no scope
+/// has no unit, is refused, and the refusal rolls back the business write that
+/// triggered the audit. A bare pool acquire is always such a connection,
+/// because the request's scope lives on a different one.
+///
+/// So this opens a short transaction and relays the caller's ambient scope onto
+/// it. The transaction is required rather than incidental: the scope binder
+/// sets its variables LOCAL, and outside a transaction they are gone before the
+/// next statement. Outside any request scope nothing is bound and the write
+/// behaves exactly as it did before.
+#[allow(clippy::too_many_arguments)]
+pub async fn record_audit_on_pool(
+    pool: &sqlx::PgPool,
+    action: &str,
+    actor: Option<&str>,
+    portal_user_id: Option<Uuid>,
+    invite_id: Option<Uuid>,
+    token_id: Option<Uuid>,
+    detail: serde_json::Value,
+) -> Result<(), sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    if let Some(scope) = backbone_orm::org_scope::current_org_scope() {
+        backbone_orm::org_scope::bind_org_scope_on(&mut tx, &scope).await?;
+    }
+    record_audit(&mut *tx, action, actor, portal_user_id, invite_id, token_id, detail).await?;
+    tx.commit().await?;
+    Ok(())
+}

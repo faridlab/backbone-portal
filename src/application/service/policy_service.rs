@@ -74,7 +74,7 @@ impl PolicyService {
         .await?;
         tx.commit().await?;
 
-        crate::application::service::audit::record_audit(
+        crate::application::service::audit::record_audit_on_pool(
             &self.pool,
             "policy_changed",
             Some(officer.map(|u| u.to_string()).as_deref().unwrap_or("system")),

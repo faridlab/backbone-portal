@@ -353,7 +353,7 @@ impl TokenService {
         actor: &str,
         detail: serde_json::Value,
     ) -> Result<(), PortalError> {
-        crate::application::service::audit::record_audit(
+        crate::application::service::audit::record_audit_on_pool(
             &self.pool, event, Some(actor), user, None, token, detail,
         )
         .await?;

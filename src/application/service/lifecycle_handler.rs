@@ -167,7 +167,7 @@ impl SapiensLifecycleHandler {
 
         match linked {
             Some(portal_user_id) => {
-                crate::application::service::audit::record_audit(
+                crate::application::service::audit::record_audit_on_pool(
                     &self.pool,
                     "onboarding_linked",
                     Some(&format!("lifecycle:{}", envelope.event_type)),
@@ -187,7 +187,7 @@ impl SapiensLifecycleHandler {
                 // non-action (a new employee with no portal presence is
                 // the NORMAL case; the audit row keeps it from being a
                 // silent skip, per the digest growth-loop shape).
-                crate::application::service::audit::record_audit(
+                crate::application::service::audit::record_audit_on_pool(
                     &self.pool,
                     "onboarding_no_invitation",
                     Some(&format!("lifecycle:{}", envelope.event_type)),
@@ -252,7 +252,7 @@ impl SapiensLifecycleHandler {
             return Ok(());
         }
 
-        crate::application::service::audit::record_audit(
+        crate::application::service::audit::record_audit_on_pool(
             &self.pool,
             "lifecycle_access_revoked",
             Some(&format!("lifecycle:{}", envelope.event_type)),

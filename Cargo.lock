@@ -387,7 +387,7 @@ dependencies = [
 
 [[package]]
 name = "backbone-portal"
-version = "0.2.12"
+version = "0.2.15"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -444,8 +444,8 @@ dependencies = [
 
 [[package]]
 name = "backbone-sapiens"
-version = "0.4.7"
-source = "git+https://github.com/faridlab/backbone-sapiens?tag=v0.4.7#0e2d283003f524a09ec3ea6d2c3cefa1522feebb"
+version = "0.4.9"
+source = "git+https://github.com/faridlab/backbone-sapiens?tag=v0.4.9#4a22a9e95e8bde5001e12b2a6d6649b3d2b977b6"
 dependencies = [
  "aes-gcm",
  "anyhow",
