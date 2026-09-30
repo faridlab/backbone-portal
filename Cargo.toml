@@ -3,6 +3,7 @@ name = "backbone-portal"
 version = "0.2.28"
 edition = "2021"
 description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
+license = "MIT OR Apache-2.0"
 
 [lib]
 path = "src/lib.rs"
