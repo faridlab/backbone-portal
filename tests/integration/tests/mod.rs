@@ -6,7 +6,6 @@
 
 pub mod crud_test_base;
 
-pub mod portal_audit_log_api_test;
 pub mod portal_invite_api_test;
 pub mod portal_signup_policy_api_test;
 pub mod portal_token_api_test;
@@ -14,7 +13,6 @@ pub mod portal_user_api_test;
 
 // Re-exports for convenience
 pub use crud_test_base::*;
-pub use portal_audit_log_api_test::*;
 pub use portal_invite_api_test::*;
 pub use portal_signup_policy_api_test::*;
 pub use portal_token_api_test::*;

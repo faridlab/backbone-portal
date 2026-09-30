@@ -368,6 +368,9 @@ impl backbone_orm::EntityRepoMeta for PortalUser {
         m.insert("id".to_string(), "uuid".to_string());
         m.insert("sapiens_user_id".to_string(), "uuid".to_string());
         m.insert("status".to_string(), "portal_user_status".to_string());
+        m.insert("revoked_at".to_string(), "timestamptz".to_string());
+        m.insert("archived_at".to_string(), "timestamptz".to_string());
+        m.insert("last_login_at".to_string(), "timestamptz".to_string());
         m
     }
     fn search_fields() -> &'static [&'static str] {

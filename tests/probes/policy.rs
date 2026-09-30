@@ -29,8 +29,8 @@ async fn signup_is_off_by_default_and_fail_closed() {
             "signup against a closed policy must refuse with the typed error, got {refused:?}"
         );
         let n: i64 = sqlx::query_scalar(
-            r#"SELECT COUNT(*) FROM portal.portal_audit_log
-               WHERE event = 'signup_refused_policy_closed'"#,
+            r#"SELECT COUNT(*) FROM auditlog.audit_trails
+               WHERE action = 'signup_refused_policy_closed'"#,
         )
         .fetch_one(&db.pool)
         .await
@@ -108,8 +108,8 @@ async fn the_switch_flips_both_ways() {
             "the kill switch bites immediately"
         );
         let flips: i64 = sqlx::query_scalar(
-            r#"SELECT COUNT(*) FROM portal.portal_audit_log
-               WHERE event = 'policy_changed'"#,
+            r#"SELECT COUNT(*) FROM auditlog.audit_trails
+               WHERE action = 'policy_changed'"#,
         )
         .fetch_one(&db.pool)
         .await

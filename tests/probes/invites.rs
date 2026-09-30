@@ -122,8 +122,8 @@ async fn revocation_list_bites() {
         // The revocation itself is audited (user-less row: the invite
         // preceded any principal).
         let revoked_rows: i64 = sqlx::query_scalar(
-            r#"SELECT COUNT(*) FROM portal.portal_audit_log
-               WHERE event = 'invite_revoked'"#,
+            r#"SELECT COUNT(*) FROM auditlog.audit_trails
+               WHERE action = 'invite_revoked'"#,
         )
         .fetch_one(&db.pool)
         .await
@@ -222,8 +222,8 @@ async fn invite_mints_are_audited() {
             .await
             .unwrap_or_else(|e| panic!("mint: {e}"));
         let n: i64 = sqlx::query_scalar(
-            r#"SELECT COUNT(*) FROM portal.portal_audit_log
-               WHERE event = 'invite_minted'"#,
+            r#"SELECT COUNT(*) FROM auditlog.audit_trails
+               WHERE action = 'invite_minted'"#,
         )
         .fetch_one(&db.pool)
         .await

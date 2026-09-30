@@ -62,19 +62,19 @@ pub mod individual {
     use super::*;
 
     pub fn portal_invite_routes(service: Arc<PortalInviteService>) -> Router {
-        create_portal_invite_routes(service)
+        create_portal_invite_read_routes(service)
     }
 
     pub fn portal_signup_policy_routes(service: Arc<PortalSignupPolicyService>) -> Router {
-        create_portal_signup_policy_routes(service)
+        create_portal_signup_policy_read_routes(service)
     }
 
     pub fn portal_token_routes(service: Arc<PortalTokenService>) -> Router {
-        create_portal_token_routes(service)
+        create_portal_token_read_routes(service)
     }
 
     pub fn portal_user_routes(service: Arc<PortalUserService>) -> Router {
-        create_portal_user_routes(service)
+        create_portal_user_read_routes(service)
     }
 
 }

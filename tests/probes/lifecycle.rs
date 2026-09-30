@@ -74,8 +74,8 @@ async fn created_without_principal_audits_the_non_action() {
             .unwrap_or_else(|e| panic!("handle: {e}"));
 
         let n: i64 = sqlx::query_scalar(
-            r#"SELECT COUNT(*) FROM portal.portal_audit_log
-               WHERE event = 'onboarding_no_invitation'"#,
+            r#"SELECT COUNT(*) FROM auditlog.audit_trails
+               WHERE action = 'onboarding_no_invitation'"#,
         )
         .fetch_one(&db.pool)
         .await

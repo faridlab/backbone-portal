@@ -158,31 +158,39 @@ impl Drop for TestDb {
     }
 }
 
-/// Apply this module's migrations with a raw SQL file runner (sorted
-/// `.up.sql` order — the module's files are self-contained).
+/// Apply this module's migrations (sorted `.up.sql` order — the module's
+/// files are self-contained) after the audit capture schema its verb audits
+/// resolve against: portal's writes stage audit rows, so the auditlog
+/// sibling's enums and capture function must exist before this module's
+/// triggers do.
 async fn apply_module_migrations(pool: &PgPool, marker: &str) -> Result<(), String> {
     let manifest = env!("CARGO_MANIFEST_DIR");
-    let dir = format!("{manifest}/migrations");
-    let mut files: Vec<std::path::PathBuf> = match std::fs::read_dir(&dir) {
-        Ok(rd) => rd
-            .filter_map(|e| e.ok())
-            .map(|e| e.path())
-            .filter(|p| {
-                p.file_name().and_then(|n| n.to_str()).map(|n| n.ends_with(".up.sql")).unwrap_or(false)
-            })
-            .collect(),
-        Err(e) => return Err(format!("PROBE-FAIL: {marker}: cannot read {dir}: {e}")),
-    };
-    files.sort();
+    let dirs = [
+        format!("{manifest}/../backbone-auditlog/migrations"),
+        format!("{manifest}/migrations"),
+    ];
     let mut conn = pool
         .acquire()
         .await
         .map_err(|e| format!("PROBE-FAIL: {marker}: cannot acquire pool conn: {e}"))?;
-    for file in files {
-        let sql = std::fs::read_to_string(&file)
-            .map_err(|e| format!("PROBE-FAIL: {marker}: cannot read {}: {e}", file.display()))?;
-        if let Err(e) = sqlx::raw_sql(&sql).execute(&mut *conn).await {
-            return Err(format!("PROBE-FAIL: {marker}: migration {} failed: {e}", file.display()));
+    for dir in dirs {
+        let mut files: Vec<std::path::PathBuf> = match std::fs::read_dir(&dir) {
+            Ok(rd) => rd
+                .filter_map(|e| e.ok())
+                .map(|e| e.path())
+                .filter(|p| {
+                    p.file_name().and_then(|n| n.to_str()).map(|n| n.ends_with(".up.sql")).unwrap_or(false)
+                })
+                .collect(),
+            Err(e) => return Err(format!("PROBE-FAIL: {marker}: cannot read {dir}: {e}")),
+        };
+        files.sort();
+        for file in files {
+            let sql = std::fs::read_to_string(&file)
+                .map_err(|e| format!("PROBE-FAIL: {marker}: cannot read {}: {e}", file.display()))?;
+            if let Err(e) = sqlx::raw_sql(&sql).execute(&mut *conn).await {
+                return Err(format!("PROBE-FAIL: {marker}: migration {} failed: {e}", file.display()));
+            }
         }
     }
     Ok(())
@@ -272,8 +280,10 @@ pub async fn seed_principal(pool: &PgPool, email: &str, status: &str) -> Uuid {
 /// for the isolation probes).
 pub async fn seed_audit(pool: &PgPool, user: Uuid, event: &str) {
     let res = sqlx::query(
-        r#"INSERT INTO portal.portal_audit_log (id, event, portal_user_id, actor)
-           VALUES ($1, $2::portal_audit_event, $3, 'seed')"#,
+        r#"INSERT INTO auditlog.audit_trails
+               (id, event_type, action, status, actor, subject_type, subject_id, txid)
+           VALUES ($1, 'data_change'::audit_event_type, $2, 'success'::audit_status,
+                   'seed', 'portal.portal_users', $3::text, txid_current())"#,
     )
     .bind(Uuid::new_v4())
     .bind(event)
@@ -288,8 +298,9 @@ pub async fn seed_audit(pool: &PgPool, user: Uuid, event: &str) {
 /// The count of audit rows for a principal with the given event.
 pub async fn audit_count(pool: &PgPool, user: Uuid, event: &str) -> i64 {
     match sqlx::query_scalar::<_, i64>(
-        r#"SELECT COUNT(*) FROM portal.portal_audit_log
-           WHERE portal_user_id = $1 AND event = $2::portal_audit_event"#,
+        r#"SELECT COUNT(*) FROM auditlog.audit_trails
+           WHERE action = $2
+             AND (subject_id = $1::text OR changed->>'portal_user_id' = $1::text)"#,
     )
     .bind(user)
     .bind(event)

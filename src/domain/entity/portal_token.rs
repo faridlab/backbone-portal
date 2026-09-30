@@ -268,6 +268,10 @@ impl backbone_orm::EntityRepoMeta for PortalToken {
         m.insert("id".to_string(), "uuid".to_string());
         m.insert("user_id".to_string(), "uuid".to_string());
         m.insert("status".to_string(), "portal_token_status".to_string());
+        m.insert("token_expires_at".to_string(), "timestamptz".to_string());
+        m.insert("rotated_at".to_string(), "timestamptz".to_string());
+        m.insert("revoked_at".to_string(), "timestamptz".to_string());
+        m.insert("last_used_at".to_string(), "timestamptz".to_string());
         m
     }
     fn search_fields() -> &'static [&'static str] {
