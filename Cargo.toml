@@ -1,6 +1,6 @@
 [package]
 name = "backbone-portal"
-version = "0.2.30"
+version = "0.3.0"
 edition = "2021"
 description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
 license = "MIT OR Apache-2.0"
@@ -19,14 +19,14 @@ path = "src/lib.rs"
 # at the retire-and-new (single-rev policy: every framework source in the
 # resolved graph resolves to this one tag).
 # -----------------------------------------------------------------------------
-backbone-auditlog = { version = "0.1.28" }
-backbone-core = { version = "2.7.35", features = ["postgres"] }
-backbone-orm = { version = "2.7.35" }
-backbone-auth = { version = "2.7.35" }
-backbone-messaging = { version = "2.7.35" }
+backbone-auditlog = { version = "0.2.0" }
+backbone-core = { version = "3.0.0", features = ["postgres"] }
+backbone-orm = { version = "3.0.0" }
+backbone-auth = { version = "3.0.0" }
+backbone-messaging = { version = "3.0.0" }
 # The gated public auth family is throttled per identity AND per IP at the
 # route composer (ADR-0018 Tier B on every verification endpoint).
-backbone-rate-limit = { version = "2.7.35" }
+backbone-rate-limit = { version = "3.0.0" }
 
 # Sibling module — THE ONLY module edge. Sapiens owns the user lifecycle
 # this module subscribes to: its exported event structs (UserCreatedEvent /
@@ -34,7 +34,7 @@ backbone-rate-limit = { version = "2.7.35" }
 # subscription is written against, and its users are the identity source
 # behind the fail-closed credential port. Pinned tag-equal like every
 # sibling dep (the digest->mail precedent).
-backbone-sapiens = { version = "0.4.27" }
+backbone-sapiens = { version = "0.5.0" }
 
 # Sibling modules NOT consumed by design — recorded here so no later seat
 # adds them casually:

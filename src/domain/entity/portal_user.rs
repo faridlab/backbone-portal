@@ -334,6 +334,9 @@ impl super::Entity for PortalUser {
 }
 
 impl backbone_core::PersistentEntity for PortalUser {
+    fn write_protected_fields() -> &'static [&'static str] {
+        &["status"]
+    }
     fn entity_id(&self) -> String {
         self.id.to_string()
     }
