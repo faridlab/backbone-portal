@@ -317,6 +317,9 @@ impl PortalDocumentSurface for PgPortalSurface {
         set_arm!("zip", patch.zip.clone());
         set_arm!("vat", patch.vat.clone());
         set_arm!("company_name", patch.company_name.clone());
+        // The stamp below opens with a comma, so at least one arm must have run:
+        // `is_empty()` refused a patch that sets no field.
+        debug_assert!(!first, "a non-empty patch sets at least one column");
         // The PISO-2 identity stamp: the write records WHO wrote it —
         // the acting principal, always.
         builder.push(", metadata = jsonb_set(metadata, '{updated_by}', to_jsonb(");

@@ -1,6 +1,6 @@
 [package]
 name = "backbone-portal"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "Customer self-service portal identity — portal principals, invitation-only access with a kill-switchable signup policy default OFF, the split Tier A credentials (expiring rotatable bearer + independent per-recipient HMAC), the PI-04 field-whitelist detail verb, mint audit, and the sapiens lifecycle subscription that revokes access when the linked identity dies (Odoo portal port)"
 license = "MIT OR Apache-2.0"
@@ -11,6 +11,8 @@ exclude = [".claude/", ".github/", "graphify-out/"]
 path = "src/lib.rs"
 
 [dependencies]
+# OpenAPI schema derive, only with the `openapi` feature.
+utoipa = { version = "5", optional = true, features = ["chrono", "uuid"] }
 # -----------------------------------------------------------------------------
 # Backbone Framework crates
 #
@@ -83,6 +85,15 @@ thiserror = "1.0"
 # Configuration
 config = "0.14"
 serde_yaml = "0.9"
+
+
+[features]
+# Generated code gates its OpenAPI derives, request validation and auth extraction
+# behind these features; declaring them keeps every cfg checked by the compiler.
+default = []
+auth = []
+openapi = ["dep:utoipa"]
+validation = []
 
 [dev-dependencies]
 tempfile = "3.0"
