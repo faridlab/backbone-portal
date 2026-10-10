@@ -75,10 +75,6 @@ pub struct UpdatePortalInviteDto {
     #[cfg_attr(feature = "openapi", schema(example = "example"))]
     #[serde(alias = "recipient_email")]
     pub recipient_email: String,
-    #[cfg_attr(feature = "validation", validate(length(max = 64)))]
-    #[cfg_attr(feature = "openapi", schema(example = "example"))]
-    #[serde(alias = "token_nonce")]
-    pub token_nonce: String,
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(alias = "token_expires_at")]
     pub token_expires_at: DateTime<Utc>,
@@ -113,10 +109,6 @@ pub struct PatchPortalInviteDto {
     #[cfg_attr(feature = "openapi", schema(example = "example"))]
     #[serde(skip_serializing_if = "Option::is_none", alias = "recipient_email")]
     pub recipient_email: Option<String>,
-    #[cfg_attr(feature = "validation", validate(length(max = 64)))]
-    #[cfg_attr(feature = "openapi", schema(example = "example"))]
-    #[serde(skip_serializing_if = "Option::is_none", alias = "token_nonce")]
-    pub token_nonce: Option<String>,
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(skip_serializing_if = "Option::is_none", alias = "token_expires_at")]
     pub token_expires_at: Option<DateTime<Utc>>,
@@ -138,7 +130,7 @@ pub struct PatchPortalInviteDto {
 impl PatchPortalInviteDto {
     /// Check if any field is set
     pub fn has_changes(&self) -> bool {
-        self.recipient_email.is_some() || self.token_nonce.is_some() || self.token_expires_at.is_some() || self.status.is_some() || self.granted_by.is_some() || self.redeemed_by.is_some() || self.redeemed_at.is_some() || self.revoked_at.is_some() || self.revocation_reason.is_some()
+        self.recipient_email.is_some() || self.token_expires_at.is_some() || self.status.is_some() || self.granted_by.is_some() || self.redeemed_by.is_some() || self.redeemed_at.is_some() || self.revoked_at.is_some() || self.revocation_reason.is_some()
     }
 }
 
@@ -311,7 +303,6 @@ impl backbone_core::FromCreateDto<CreatePortalInviteDto> for PortalInvite {
 impl backbone_core::ApplyUpdateDto<UpdatePortalInviteDto> for PortalInvite {
     fn apply_update(mut self, dto: UpdatePortalInviteDto) -> backbone_core::ServiceResult<Self> {
         self.recipient_email = dto.recipient_email;
-        self.token_nonce = dto.token_nonce;
         self.token_expires_at = dto.token_expires_at;
         self.status = dto.status;
         self.granted_by = dto.granted_by;

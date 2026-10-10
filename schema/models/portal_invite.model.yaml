@@ -35,7 +35,7 @@ models:
         description: "The invited email — the grant binds to it (MAC grant 'portal_invite:{recipient_email}'), so a link forwarded to another mailbox refuses at redemption (the email in the link and the email presenting it must agree)."
       token_nonce:
         type: string
-        attributes: ["@required", "@max(64)", "@indexed"]
+        attributes: ["@required", "@max(64)", "@indexed", "@sensitive", "@immutable"]
         description: "128-bit hex SELECTOR of the invitation capability — the public link carries {invite_id}.{nonce}.{exp}.{mac}; the nonce alone is not the capability. UNIQUE among all rows (rotation/re-mint issues a fresh nonce on a NEW row; a re-invite never reuses a selector)."
       token_expires_at:
         type: datetime

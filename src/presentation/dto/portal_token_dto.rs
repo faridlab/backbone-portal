@@ -73,10 +73,6 @@ pub struct UpdatePortalTokenDto {
     #[cfg_attr(feature = "openapi", schema(example = "550e8400-e29b-41d4-a716-446655440000"))]
     #[serde(alias = "user_id")]
     pub user_id: Uuid,
-    #[cfg_attr(feature = "validation", validate(length(max = 64)))]
-    #[cfg_attr(feature = "openapi", schema(example = "example"))]
-    #[serde(alias = "token_nonce")]
-    pub token_nonce: String,
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(alias = "token_expires_at")]
     pub token_expires_at: DateTime<Utc>,
@@ -110,10 +106,6 @@ pub struct PatchPortalTokenDto {
     #[cfg_attr(feature = "openapi", schema(example = "550e8400-e29b-41d4-a716-446655440000"))]
     #[serde(skip_serializing_if = "Option::is_none", alias = "user_id")]
     pub user_id: Option<Uuid>,
-    #[cfg_attr(feature = "validation", validate(length(max = 64)))]
-    #[cfg_attr(feature = "openapi", schema(example = "example"))]
-    #[serde(skip_serializing_if = "Option::is_none", alias = "token_nonce")]
-    pub token_nonce: Option<String>,
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(skip_serializing_if = "Option::is_none", alias = "token_expires_at")]
     pub token_expires_at: Option<DateTime<Utc>>,
@@ -135,7 +127,7 @@ pub struct PatchPortalTokenDto {
 impl PatchPortalTokenDto {
     /// Check if any field is set
     pub fn has_changes(&self) -> bool {
-        self.user_id.is_some() || self.token_nonce.is_some() || self.token_expires_at.is_some() || self.status.is_some() || self.rotated_at.is_some() || self.rotated_to.is_some() || self.revoked_at.is_some() || self.revocation_reason.is_some() || self.last_used_at.is_some()
+        self.user_id.is_some() || self.token_expires_at.is_some() || self.status.is_some() || self.rotated_at.is_some() || self.rotated_to.is_some() || self.revoked_at.is_some() || self.revocation_reason.is_some() || self.last_used_at.is_some()
     }
 }
 
@@ -308,7 +300,6 @@ impl backbone_core::FromCreateDto<CreatePortalTokenDto> for PortalToken {
 impl backbone_core::ApplyUpdateDto<UpdatePortalTokenDto> for PortalToken {
     fn apply_update(mut self, dto: UpdatePortalTokenDto) -> backbone_core::ServiceResult<Self> {
         self.user_id = dto.user_id;
-        self.token_nonce = dto.token_nonce;
         self.token_expires_at = dto.token_expires_at;
         self.status = dto.status;
         self.rotated_at = dto.rotated_at;

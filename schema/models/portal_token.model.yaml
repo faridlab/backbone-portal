@@ -39,7 +39,7 @@ models:
         description: "The owning principal (relation-driven FK, ON DELETE CASCADE — a hard-deleted principal's tokens die with the row)."
       token_nonce:
         type: string
-        attributes: ["@required", "@max(64)", "@indexed"]
+        attributes: ["@required", "@max(64)", "@indexed", "@sensitive", "@immutable"]
         description: "128-bit hex SELECTOR of the bearer — rotation mints a fresh one atomically; UNIQUE across all rows (a selector is never reused, live or dead)."
       token_expires_at:
         type: datetime

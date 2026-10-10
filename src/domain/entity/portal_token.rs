@@ -235,7 +235,7 @@ impl super::Entity for PortalToken {
 
 impl backbone_core::PersistentEntity for PortalToken {
     fn write_protected_fields() -> &'static [&'static str] {
-        &["status"]
+        &["token_nonce", "status"]
     }
     fn entity_id(&self) -> String {
         self.id.to_string()
@@ -278,7 +278,10 @@ impl backbone_orm::EntityRepoMeta for PortalToken {
         m
     }
     fn search_fields() -> &'static [&'static str] {
-        &["token_nonce"]
+        &[]
+    }
+    fn secret_fields() -> &'static [&'static str] {
+        &["tokenNonce"]
     }
     fn relations() -> &'static [(&'static str, &'static str, &'static str)] {
         &[("user", "portal_users", "userId")]

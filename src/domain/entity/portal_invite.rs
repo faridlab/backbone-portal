@@ -235,7 +235,7 @@ impl super::Entity for PortalInvite {
 
 impl backbone_core::PersistentEntity for PortalInvite {
     fn write_protected_fields() -> &'static [&'static str] {
-        &["status"]
+        &["token_nonce", "status"]
     }
     fn entity_id(&self) -> String {
         self.id.to_string()
@@ -276,7 +276,10 @@ impl backbone_orm::EntityRepoMeta for PortalInvite {
         m
     }
     fn search_fields() -> &'static [&'static str] {
-        &["recipient_email", "token_nonce"]
+        &["recipient_email"]
+    }
+    fn secret_fields() -> &'static [&'static str] {
+        &["tokenNonce"]
     }
 }
 
