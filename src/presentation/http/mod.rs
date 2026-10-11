@@ -11,11 +11,6 @@ pub mod portal_token_handler;
 pub mod portal_user_handler;
 
 // <<< CUSTOM
-// The hand-written public auth tree (user-owned — see
-// metaphor.codegen.yaml). The module does NOT self-mount it; the host
-// nests the exported router at /api/v1/portal behind its gates.
-pub mod public_routes;
-pub use public_routes::{portal_public_routes, PortalPublicState};
 // END CUSTOM
 
 // Re-exports
@@ -25,3 +20,6 @@ pub use portal_token_handler::{create_portal_token_routes, create_portal_token_r
 pub use portal_user_handler::{create_portal_user_routes, create_portal_user_read_routes, create_portal_user_write_routes};
 // <<< CUSTOM
 // END CUSTOM
+
+// This directory's extension (hand-written; ADR-0031).
+include!("mod.ext.rs");
