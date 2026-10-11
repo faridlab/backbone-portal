@@ -10,8 +10,6 @@ mod portal_token_repository;
 mod portal_user_repository;
 
 // Custom persistence modules
-// <<< CUSTOM
-// END CUSTOM
 
 // Re-exports
 pub use portal_invite_repository::PortalInviteRepository;
@@ -27,5 +25,3 @@ pub use backbone_orm::repository::{
 };
 
 // Re-export custom persistence types
-// <<< CUSTOM
-// END CUSTOM

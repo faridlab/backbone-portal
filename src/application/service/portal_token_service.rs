@@ -32,5 +32,3 @@ pub type PortalTokenService = GenericCrudService<
     PortalTokenRepository,
 >;
 
-// <<< CUSTOM
-// END CUSTOM

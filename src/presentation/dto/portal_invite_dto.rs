@@ -318,7 +318,7 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalInviteDto> for PortalInvite {
 // Custom DTOs
 // =============================================================================
 
-// <<< CUSTOM DTOs
 // Add custom DTOs specific to PortalInvite here.
 // This section will be preserved during regeneration.
 // >>> END CUSTOM DTOs
+

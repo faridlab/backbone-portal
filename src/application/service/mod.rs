@@ -12,15 +12,11 @@ pub mod portal_signup_policy_service;
 pub mod portal_token_service;
 pub mod portal_user_service;
 
-// <<< CUSTOM
-// END CUSTOM
 
 pub use portal_invite_service::PortalInviteService;
 pub use portal_signup_policy_service::PortalSignupPolicyService;
 pub use portal_token_service::PortalTokenService;
 pub use portal_user_service::PortalUserService;
-// <<< CUSTOM
-// END CUSTOM
 
 // This directory's extension (hand-written; ADR-0031).
 include!("mod.ext.rs");

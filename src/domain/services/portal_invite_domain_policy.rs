@@ -18,5 +18,3 @@ use crate::domain::entity::PortalInvite;
 /// service. `PermitAllPolicy` is the safe default until then.
 pub type PortalInviteDomainPolicy = PermitAllPolicy<PortalInvite>;
 
-// <<< CUSTOM
-// END CUSTOM

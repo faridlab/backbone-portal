@@ -186,3 +186,4 @@ pub fn create_protected_portal_signup_policy_routes<A: AuthMiddleware + Send + S
             }
         }))
 }
+

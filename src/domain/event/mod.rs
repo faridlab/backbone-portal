@@ -20,5 +20,3 @@ pub use portal_token_event_handlers::PortalTokenEventHandler;
 pub use portal_user_events::{PortalUserEvent, PortalUserEventPublisher, NoopPortalUserEventPublisher};
 pub use portal_user_event_handlers::PortalUserEventHandler;
 
-// <<< CUSTOM
-// END CUSTOM

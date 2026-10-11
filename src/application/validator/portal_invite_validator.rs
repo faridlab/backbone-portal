@@ -18,9 +18,5 @@ pub fn portal_invite_validator() -> PortalInviteValidator {
         .rule(RequiredString::new("recipient_email", |e: &PortalInvite| &e.recipient_email))
         .rule(RequiredString::new("token_nonce", |e: &PortalInvite| &e.token_nonce))
         .rule(OptionalNotBlank::new("revocation_reason", |e: &PortalInvite| e.revocation_reason.as_deref()))
-    // <<< CUSTOM RULES
-    // END CUSTOM RULES
 }
 
-// <<< CUSTOM
-// END CUSTOM

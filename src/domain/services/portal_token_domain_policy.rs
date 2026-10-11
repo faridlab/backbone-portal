@@ -18,5 +18,3 @@ use crate::domain::entity::PortalToken;
 /// service. `PermitAllPolicy` is the safe default until then.
 pub type PortalTokenDomainPolicy = PermitAllPolicy<PortalToken>;
 
-// <<< CUSTOM
-// END CUSTOM

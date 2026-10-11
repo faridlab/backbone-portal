@@ -32,5 +32,3 @@ pub type PortalInviteService = GenericCrudService<
     PortalInviteRepository,
 >;
 
-// <<< CUSTOM
-// END CUSTOM

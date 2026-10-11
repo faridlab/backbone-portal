@@ -17,9 +17,5 @@ pub fn portal_token_validator() -> PortalTokenValidator {
     EntityValidator::new()
         .rule(RequiredString::new("token_nonce", |e: &PortalToken| &e.token_nonce))
         .rule(OptionalNotBlank::new("revocation_reason", |e: &PortalToken| e.revocation_reason.as_deref()))
-    // <<< CUSTOM RULES
-    // END CUSTOM RULES
 }
 
-// <<< CUSTOM
-// END CUSTOM

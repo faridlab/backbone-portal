@@ -432,7 +432,7 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalUserDto> for PortalUser {
 // Custom DTOs
 // =============================================================================
 
-// <<< CUSTOM DTOs
 // Add custom DTOs specific to PortalUser here.
 // This section will be preserved during regeneration.
 // >>> END CUSTOM DTOs
+

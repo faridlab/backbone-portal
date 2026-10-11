@@ -16,9 +16,5 @@ pub type PortalSignupPolicyValidator = EntityValidator<PortalSignupPolicy>;
 pub fn portal_signup_policy_validator() -> PortalSignupPolicyValidator {
     EntityValidator::new()
         .rule(OptionalNotBlank::new("note", |e: &PortalSignupPolicy| e.note.as_deref()))
-    // <<< CUSTOM RULES
-    // END CUSTOM RULES
 }
 
-// <<< CUSTOM
-// END CUSTOM

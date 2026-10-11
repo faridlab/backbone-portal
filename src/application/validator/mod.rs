@@ -15,5 +15,3 @@ pub use portal_signup_policy_validator::{PortalSignupPolicyValidator, portal_sig
 pub use portal_token_validator::{PortalTokenValidator, portal_token_validator};
 pub use portal_user_validator::{PortalUserValidator, portal_user_validator};
 
-// <<< CUSTOM
-// END CUSTOM

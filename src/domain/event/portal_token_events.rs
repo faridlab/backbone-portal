@@ -11,8 +11,6 @@ use crate::domain::entity::PortalToken;
 /// enum containing a `Crud(CrudEvent<PortalToken>)` variant.
 pub type PortalTokenEvent = CrudEvent<PortalToken>;
 
-// <<< CUSTOM
-// END CUSTOM
 
 use backbone_messaging::{CrudEventPublisher, NoOpCrudEventPublisher};
 use std::sync::Arc;

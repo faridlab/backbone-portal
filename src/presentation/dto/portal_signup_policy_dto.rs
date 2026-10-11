@@ -246,7 +246,7 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalSignupPolicyDto> for PortalSignup
 // Custom DTOs
 // =============================================================================
 
-// <<< CUSTOM DTOs
 // Add custom DTOs specific to PortalSignupPolicy here.
 // This section will be preserved during regeneration.
 // >>> END CUSTOM DTOs
+

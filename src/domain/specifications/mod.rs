@@ -11,5 +11,3 @@ pub mod portal_signup_policy_specification;
 pub mod portal_token_specification;
 pub mod portal_user_specification;
 
-// <<< CUSTOM
-// END CUSTOM

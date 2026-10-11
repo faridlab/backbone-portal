@@ -27,9 +27,5 @@ pub fn portal_user_validator() -> PortalUserValidator {
         .rule(OptionalNotBlank::new("vat", |e: &PortalUser| e.vat.as_deref()))
         .rule(OptionalNotBlank::new("company_name", |e: &PortalUser| e.company_name.as_deref()))
         .rule(OptionalNotBlank::new("revocation_reason", |e: &PortalUser| e.revocation_reason.as_deref()))
-    // <<< CUSTOM RULES
-    // END CUSTOM RULES
 }
 
-// <<< CUSTOM
-// END CUSTOM

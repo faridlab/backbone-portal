@@ -315,7 +315,7 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalTokenDto> for PortalToken {
 // Custom DTOs
 // =============================================================================
 
-// <<< CUSTOM DTOs
 // Add custom DTOs specific to PortalToken here.
 // This section will be preserved during regeneration.
 // >>> END CUSTOM DTOs
+

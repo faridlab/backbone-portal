@@ -12,5 +12,3 @@ pub use portal_signup_policy_domain_policy::PortalSignupPolicyDomainPolicy;
 pub use portal_token_domain_policy::PortalTokenDomainPolicy;
 pub use portal_user_domain_policy::PortalUserDomainPolicy;
 
-// <<< CUSTOM
-// END CUSTOM

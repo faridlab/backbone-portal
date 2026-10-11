@@ -18,5 +18,3 @@ use crate::domain::entity::PortalUser;
 /// service. `PermitAllPolicy` is the safe default until then.
 pub type PortalUserDomainPolicy = PermitAllPolicy<PortalUser>;
 
-// <<< CUSTOM
-// END CUSTOM

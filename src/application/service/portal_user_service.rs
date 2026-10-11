@@ -32,5 +32,3 @@ pub type PortalUserService = GenericCrudService<
     PortalUserRepository,
 >;
 
-// <<< CUSTOM
-// END CUSTOM

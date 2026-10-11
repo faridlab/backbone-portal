@@ -24,8 +24,6 @@ pub mod application;
 pub mod presentation;
 pub mod seeders;
 pub mod exports;
-// <<< CUSTOM MODULES
-// END CUSTOM
 
 // Re-exports for convenience - Domain entities
 pub use domain::entity::*;
@@ -60,8 +58,6 @@ pub struct PortalModule {
     pub(crate) portal_signup_policy_service: Arc<PortalSignupPolicyService>,
     pub(crate) portal_token_service: Arc<PortalTokenService>,
     pub(crate) portal_user_service: Arc<PortalUserService>,
-    // <<< CUSTOM FIELDS
-    // END CUSTOM
 }
 
 impl PortalModule {
@@ -120,15 +116,11 @@ impl PortalModule {
             .merge(create_portal_user_read_routes(self.portal_user_service.clone()))
     }
 
-    // <<< CUSTOM METHODS
-    // END CUSTOM
 }
 
 /// Builder for PortalModule
 pub struct PortalModuleBuilder {
     db_pool: Option<PgPool>,
-    // <<< CUSTOM BUILDER FIELDS
-    // END CUSTOM
 }
 
 impl PortalModuleBuilder {
@@ -136,8 +128,6 @@ impl PortalModuleBuilder {
     pub fn new() -> Self {
         Self {
             db_pool: None,
-            // <<< CUSTOM BUILDER DEFAULTS
-            // END CUSTOM
         }
     }
 
@@ -147,8 +137,6 @@ impl PortalModuleBuilder {
         self
     }
 
-    // <<< CUSTOM - custom builder methods
-    // END CUSTOM
 
     /// Build the module with configured dependencies
     pub fn build(self) -> anyhow::Result<PortalModule> {
@@ -171,16 +159,12 @@ impl PortalModuleBuilder {
         let portal_user_repository = Arc::new(PortalUserRepository::new(db_pool.clone()));
         let portal_user_service = Arc::new(PortalUserService::with_repository(portal_user_repository.clone()));
 
-        // <<< CUSTOM
-        // END CUSTOM
 
         Ok(PortalModule {
             portal_invite_service,
             portal_signup_policy_service,
             portal_token_service,
             portal_user_service,
-            // <<< CUSTOM
-            // END CUSTOM
         })
     }
 }

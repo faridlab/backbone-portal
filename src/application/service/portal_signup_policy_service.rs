@@ -32,5 +32,3 @@ pub type PortalSignupPolicyService = GenericCrudService<
     PortalSignupPolicyRepository,
 >;
 
-// <<< CUSTOM
-// END CUSTOM

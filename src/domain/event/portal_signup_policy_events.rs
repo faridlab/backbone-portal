@@ -11,8 +11,6 @@ use crate::domain::entity::PortalSignupPolicy;
 /// enum containing a `Crud(CrudEvent<PortalSignupPolicy>)` variant.
 pub type PortalSignupPolicyEvent = CrudEvent<PortalSignupPolicy>;
 
-// <<< CUSTOM
-// END CUSTOM
 
 use backbone_messaging::{CrudEventPublisher, NoOpCrudEventPublisher};
 use std::sync::Arc;
