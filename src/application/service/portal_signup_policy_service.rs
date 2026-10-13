@@ -32,3 +32,36 @@ pub type PortalSignupPolicyService = GenericCrudService<
     PortalSignupPolicyRepository,
 >;
 
+/// The rules the schema declares for PortalSignupPolicy, checked against the row a create or update
+/// would store. The generated build attaches it to [`PortalSignupPolicyService`]. A refusing rule's
+/// break answers 422; a rule in shadow is logged under `backbone::write_guard` and the
+/// write goes ahead.
+pub struct PortalSignupPolicyRowRules;
+
+#[async_trait::async_trait]
+impl backbone_core::write_guard::WriteGuard<PortalSignupPolicy> for PortalSignupPolicyRowRules {
+    async fn check(
+        &self,
+        ctx: &backbone_core::write_guard::WriteCtx<'_, PortalSignupPolicy>,
+    ) -> backbone_core::write_guard::GuardOutcome {
+        use backbone_core::row_rule as r;
+        use backbone_core::violation::Violation;
+        use backbone_core::write_guard::{GuardOutcome, WriteKind};
+        let (create, update) = (ctx.kind == WriteKind::Create, ctx.kind == WriteKind::Update);
+        let Some(after) = ctx.after.filter(|_| create || update) else {
+            return GuardOutcome::allow();
+        };
+        let Ok(row) = serde_json::to_value(after) else {
+            return GuardOutcome::allow();
+        };
+        let row = &row;
+        let old = ctx.before.and_then(|b| serde_json::to_value(b).ok());
+        let mut shadow = Vec::new();
+        // `note_max_length` (@max(200) on PortalSignupPolicy.note)
+        if (create || (update && r::changed(old.as_ref(), row, &["note"]))) && !r::holds(&r::le(r::length(r::field(row, "note")), r::Val::Num(200.0_f64))) {
+            shadow.push(Violation::new("note", "max_length", "note must be at most 200 characters").with_param("max", 200_i64));
+        }
+        GuardOutcome { refuse: Vec::new(), shadow }
+    }
+}
+

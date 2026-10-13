@@ -32,3 +32,53 @@ pub type PortalInviteService = GenericCrudService<
     PortalInviteRepository,
 >;
 
+/// The rules the schema declares for PortalInvite, checked against the row a create or update
+/// would store. The generated build attaches it to [`PortalInviteService`]. A refusing rule's
+/// break answers 422; a rule in shadow is logged under `backbone::write_guard` and the
+/// write goes ahead.
+pub struct PortalInviteRowRules;
+
+#[async_trait::async_trait]
+impl backbone_core::write_guard::WriteGuard<PortalInvite> for PortalInviteRowRules {
+    async fn check(
+        &self,
+        ctx: &backbone_core::write_guard::WriteCtx<'_, PortalInvite>,
+    ) -> backbone_core::write_guard::GuardOutcome {
+        use backbone_core::row_rule as r;
+        use backbone_core::violation::Violation;
+        use backbone_core::write_guard::{GuardOutcome, WriteKind};
+        let (create, update) = (ctx.kind == WriteKind::Create, ctx.kind == WriteKind::Update);
+        let Some(after) = ctx.after.filter(|_| create || update) else {
+            return GuardOutcome::allow();
+        };
+        let Ok(row) = serde_json::to_value(after) else {
+            return GuardOutcome::allow();
+        };
+        let row = &row;
+        let old = ctx.before.and_then(|b| serde_json::to_value(b).ok());
+        let mut shadow = Vec::new();
+        let mut refuse = Vec::new();
+        // `recipient_email_required` (@required on PortalInvite.recipient_email)
+        if (create || (update && r::changed(old.as_ref(), row, &["recipient_email"]))) && !r::holds(&r::and(r::is_not_null(r::field(row, "recipient_email")), r::not(r::is_empty(r::trim(r::field(row, "recipient_email")))))) {
+            refuse.push(Violation::new("recipient_email", "required", "recipient_email is required"));
+        }
+        // `recipient_email_max_length` (@max(320) on PortalInvite.recipient_email)
+        if (create || (update && r::changed(old.as_ref(), row, &["recipient_email"]))) && !r::holds(&r::le(r::length(r::field(row, "recipient_email")), r::Val::Num(320.0_f64))) {
+            shadow.push(Violation::new("recipient_email", "max_length", "recipient_email must be at most 320 characters").with_param("max", 320_i64));
+        }
+        // `token_nonce_required` (@required on PortalInvite.token_nonce)
+        if (create || (update && r::changed(old.as_ref(), row, &["token_nonce"]))) && !r::holds(&r::and(r::is_not_null(r::field(row, "token_nonce")), r::not(r::is_empty(r::trim(r::field(row, "token_nonce")))))) {
+            refuse.push(Violation::new("token_nonce", "required", "token_nonce is required"));
+        }
+        // `token_nonce_max_length` (@max(64) on PortalInvite.token_nonce)
+        if (create || (update && r::changed(old.as_ref(), row, &["token_nonce"]))) && !r::holds(&r::le(r::length(r::field(row, "token_nonce")), r::Val::Num(64.0_f64))) {
+            shadow.push(Violation::new("token_nonce", "max_length", "token_nonce must be at most 64 characters").with_param("max", 64_i64));
+        }
+        // `revocation_reason_max_length` (@max(120) on PortalInvite.revocation_reason)
+        if (create || (update && r::changed(old.as_ref(), row, &["revocation_reason"]))) && !r::holds(&r::le(r::length(r::field(row, "revocation_reason")), r::Val::Num(120.0_f64))) {
+            shadow.push(Violation::new("revocation_reason", "max_length", "revocation_reason must be at most 120 characters").with_param("max", 120_i64));
+        }
+        GuardOutcome { refuse, shadow }
+    }
+}
+

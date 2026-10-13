@@ -17,6 +17,10 @@ pub use portal_invite_service::PortalInviteService;
 pub use portal_signup_policy_service::PortalSignupPolicyService;
 pub use portal_token_service::PortalTokenService;
 pub use portal_user_service::PortalUserService;
+pub use portal_invite_service::PortalInviteRowRules;
+pub use portal_signup_policy_service::PortalSignupPolicyRowRules;
+pub use portal_token_service::PortalTokenRowRules;
+pub use portal_user_service::PortalUserRowRules;
 
 // This directory's extension (hand-written; ADR-0031).
 include!("mod.ext.rs");
