@@ -384,7 +384,7 @@ dependencies = [
 
 [[package]]
 name = "backbone-portal"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -443,9 +443,9 @@ dependencies = [
 
 [[package]]
 name = "backbone-sapiens"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40c79b5d3b19163648d99d2e3eccfc02fd8544213ebc28103a1905517c1b9a14"
+checksum = "75d401c5d2161138c74ed1c2a70a41694dd31e3726881e256506dd78c162d988"
 dependencies = [
  "aes-gcm",
  "anyhow",
