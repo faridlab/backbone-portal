@@ -56,12 +56,13 @@ impl backbone_core::write_guard::WriteGuard<PortalSignupPolicy> for PortalSignup
         };
         let row = &row;
         let old = ctx.before.and_then(|b| serde_json::to_value(b).ok());
-        let mut shadow = Vec::new();
+        let shadow = Vec::new();
+        let mut refuse = Vec::new();
         // `note_max_length` (@max(200) on PortalSignupPolicy.note)
         if (create || (update && r::changed(old.as_ref(), row, &["note"]))) && !r::holds(&r::le(r::length(r::field(row, "note")), r::Val::Num(200.0_f64))) {
-            shadow.push(Violation::new("note", "max_length", "note must be at most 200 characters").with_param("max", 200_i64));
+            refuse.push(Violation::new("note", "max_length", "note must be at most 200 characters").with_param("max", 200_i64));
         }
-        GuardOutcome { refuse: Vec::new(), shadow }
+        GuardOutcome { refuse, shadow }
     }
 }
 

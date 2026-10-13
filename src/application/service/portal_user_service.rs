@@ -56,7 +56,7 @@ impl backbone_core::write_guard::WriteGuard<PortalUser> for PortalUserRowRules {
         };
         let row = &row;
         let old = ctx.before.and_then(|b| serde_json::to_value(b).ok());
-        let mut shadow = Vec::new();
+        let shadow = Vec::new();
         let mut refuse = Vec::new();
         // `email_required` (@required on PortalUser.email)
         if (create || (update && r::changed(old.as_ref(), row, &["email"]))) && !r::holds(&r::and(r::is_not_null(r::field(row, "email")), r::not(r::is_empty(r::trim(r::field(row, "email")))))) {
@@ -64,51 +64,51 @@ impl backbone_core::write_guard::WriteGuard<PortalUser> for PortalUserRowRules {
         }
         // `email_max_length` (@max(320) on PortalUser.email)
         if (create || (update && r::changed(old.as_ref(), row, &["email"]))) && !r::holds(&r::le(r::length(r::field(row, "email")), r::Val::Num(320.0_f64))) {
-            shadow.push(Violation::new("email", "max_length", "email must be at most 320 characters").with_param("max", 320_i64));
+            refuse.push(Violation::new("email", "max_length", "email must be at most 320 characters").with_param("max", 320_i64));
         }
         // `display_name_max_length` (@max(120) on PortalUser.display_name)
         if (create || (update && r::changed(old.as_ref(), row, &["display_name"]))) && !r::holds(&r::le(r::length(r::field(row, "display_name")), r::Val::Num(120.0_f64))) {
-            shadow.push(Violation::new("display_name", "max_length", "display_name must be at most 120 characters").with_param("max", 120_i64));
+            refuse.push(Violation::new("display_name", "max_length", "display_name must be at most 120 characters").with_param("max", 120_i64));
         }
         // `phone_max_length` (@max(40) on PortalUser.phone)
         if (create || (update && r::changed(old.as_ref(), row, &["phone"]))) && !r::holds(&r::le(r::length(r::field(row, "phone")), r::Val::Num(40.0_f64))) {
-            shadow.push(Violation::new("phone", "max_length", "phone must be at most 40 characters").with_param("max", 40_i64));
+            refuse.push(Violation::new("phone", "max_length", "phone must be at most 40 characters").with_param("max", 40_i64));
         }
         // `street_max_length` (@max(160) on PortalUser.street)
         if (create || (update && r::changed(old.as_ref(), row, &["street"]))) && !r::holds(&r::le(r::length(r::field(row, "street")), r::Val::Num(160.0_f64))) {
-            shadow.push(Violation::new("street", "max_length", "street must be at most 160 characters").with_param("max", 160_i64));
+            refuse.push(Violation::new("street", "max_length", "street must be at most 160 characters").with_param("max", 160_i64));
         }
         // `street2_max_length` (@max(160) on PortalUser.street2)
         if (create || (update && r::changed(old.as_ref(), row, &["street2"]))) && !r::holds(&r::le(r::length(r::field(row, "street2")), r::Val::Num(160.0_f64))) {
-            shadow.push(Violation::new("street2", "max_length", "street2 must be at most 160 characters").with_param("max", 160_i64));
+            refuse.push(Violation::new("street2", "max_length", "street2 must be at most 160 characters").with_param("max", 160_i64));
         }
         // `city_max_length` (@max(80) on PortalUser.city)
         if (create || (update && r::changed(old.as_ref(), row, &["city"]))) && !r::holds(&r::le(r::length(r::field(row, "city")), r::Val::Num(80.0_f64))) {
-            shadow.push(Violation::new("city", "max_length", "city must be at most 80 characters").with_param("max", 80_i64));
+            refuse.push(Violation::new("city", "max_length", "city must be at most 80 characters").with_param("max", 80_i64));
         }
         // `state_id_max_length` (@max(80) on PortalUser.state_id)
         if (create || (update && r::changed(old.as_ref(), row, &["state_id"]))) && !r::holds(&r::le(r::length(r::field(row, "state_id")), r::Val::Num(80.0_f64))) {
-            shadow.push(Violation::new("state_id", "max_length", "state_id must be at most 80 characters").with_param("max", 80_i64));
+            refuse.push(Violation::new("state_id", "max_length", "state_id must be at most 80 characters").with_param("max", 80_i64));
         }
         // `country_id_max_length` (@max(8) on PortalUser.country_id)
         if (create || (update && r::changed(old.as_ref(), row, &["country_id"]))) && !r::holds(&r::le(r::length(r::field(row, "country_id")), r::Val::Num(8.0_f64))) {
-            shadow.push(Violation::new("country_id", "max_length", "country_id must be at most 8 characters").with_param("max", 8_i64));
+            refuse.push(Violation::new("country_id", "max_length", "country_id must be at most 8 characters").with_param("max", 8_i64));
         }
         // `zip_max_length` (@max(24) on PortalUser.zip)
         if (create || (update && r::changed(old.as_ref(), row, &["zip"]))) && !r::holds(&r::le(r::length(r::field(row, "zip")), r::Val::Num(24.0_f64))) {
-            shadow.push(Violation::new("zip", "max_length", "zip must be at most 24 characters").with_param("max", 24_i64));
+            refuse.push(Violation::new("zip", "max_length", "zip must be at most 24 characters").with_param("max", 24_i64));
         }
         // `vat_max_length` (@max(40) on PortalUser.vat)
         if (create || (update && r::changed(old.as_ref(), row, &["vat"]))) && !r::holds(&r::le(r::length(r::field(row, "vat")), r::Val::Num(40.0_f64))) {
-            shadow.push(Violation::new("vat", "max_length", "vat must be at most 40 characters").with_param("max", 40_i64));
+            refuse.push(Violation::new("vat", "max_length", "vat must be at most 40 characters").with_param("max", 40_i64));
         }
         // `company_name_max_length` (@max(120) on PortalUser.company_name)
         if (create || (update && r::changed(old.as_ref(), row, &["company_name"]))) && !r::holds(&r::le(r::length(r::field(row, "company_name")), r::Val::Num(120.0_f64))) {
-            shadow.push(Violation::new("company_name", "max_length", "company_name must be at most 120 characters").with_param("max", 120_i64));
+            refuse.push(Violation::new("company_name", "max_length", "company_name must be at most 120 characters").with_param("max", 120_i64));
         }
         // `revocation_reason_max_length` (@max(120) on PortalUser.revocation_reason)
         if (create || (update && r::changed(old.as_ref(), row, &["revocation_reason"]))) && !r::holds(&r::le(r::length(r::field(row, "revocation_reason")), r::Val::Num(120.0_f64))) {
-            shadow.push(Violation::new("revocation_reason", "max_length", "revocation_reason must be at most 120 characters").with_param("max", 120_i64));
+            refuse.push(Violation::new("revocation_reason", "max_length", "revocation_reason must be at most 120 characters").with_param("max", 120_i64));
         }
         GuardOutcome { refuse, shadow }
     }
