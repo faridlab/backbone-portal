@@ -145,19 +145,19 @@ impl PortalModuleBuilder {
 
         // PortalInvite service
         let portal_invite_repository = Arc::new(PortalInviteRepository::new(db_pool.clone()));
-        let portal_invite_service = Arc::new(PortalInviteService::with_repository(portal_invite_repository.clone()).with_guard(Arc::new(crate::application::service::PortalInviteRowRules)));
+        let portal_invite_service = Arc::new(crate::application::service::build_portal_invite_service(portal_invite_repository.clone()));
 
         // PortalSignupPolicy service
         let portal_signup_policy_repository = Arc::new(PortalSignupPolicyRepository::new(db_pool.clone()));
-        let portal_signup_policy_service = Arc::new(PortalSignupPolicyService::with_repository(portal_signup_policy_repository.clone()).with_guard(Arc::new(crate::application::service::PortalSignupPolicyRowRules)));
+        let portal_signup_policy_service = Arc::new(crate::application::service::build_portal_signup_policy_service(portal_signup_policy_repository.clone()));
 
         // PortalToken service
         let portal_token_repository = Arc::new(PortalTokenRepository::new(db_pool.clone()));
-        let portal_token_service = Arc::new(PortalTokenService::with_repository(portal_token_repository.clone()).with_guard(Arc::new(crate::application::service::PortalTokenRowRules)));
+        let portal_token_service = Arc::new(crate::application::service::build_portal_token_service(portal_token_repository.clone()));
 
         // PortalUser service
         let portal_user_repository = Arc::new(PortalUserRepository::new(db_pool.clone()));
-        let portal_user_service = Arc::new(PortalUserService::with_repository(portal_user_repository.clone()).with_guard(Arc::new(crate::application::service::PortalUserRowRules)));
+        let portal_user_service = Arc::new(crate::application::service::build_portal_user_service(portal_user_repository.clone()));
 
 
         Ok(PortalModule {

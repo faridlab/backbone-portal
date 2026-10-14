@@ -22,5 +22,37 @@ pub use portal_signup_policy_service::PortalSignupPolicyRowRules;
 pub use portal_token_service::PortalTokenRowRules;
 pub use portal_user_service::PortalUserRowRules;
 
+/// A `PortalInviteService` over `repository` with its write guard attached: the way to build it, so its writes are
+/// served only with the rules the schema declares.
+pub fn build_portal_invite_service(
+    repository: std::sync::Arc<crate::infrastructure::persistence::PortalInviteRepository>,
+) -> PortalInviteService {
+    PortalInviteService::with_repository(repository).with_guard(std::sync::Arc::new(PortalInviteRowRules))
+}
+
+/// A `PortalSignupPolicyService` over `repository` with its write guard attached: the way to build it, so its writes are
+/// served only with the rules the schema declares.
+pub fn build_portal_signup_policy_service(
+    repository: std::sync::Arc<crate::infrastructure::persistence::PortalSignupPolicyRepository>,
+) -> PortalSignupPolicyService {
+    PortalSignupPolicyService::with_repository(repository).with_guard(std::sync::Arc::new(PortalSignupPolicyRowRules))
+}
+
+/// A `PortalTokenService` over `repository` with its write guard attached: the way to build it, so its writes are
+/// served only with the rules the schema declares.
+pub fn build_portal_token_service(
+    repository: std::sync::Arc<crate::infrastructure::persistence::PortalTokenRepository>,
+) -> PortalTokenService {
+    PortalTokenService::with_repository(repository).with_guard(std::sync::Arc::new(PortalTokenRowRules))
+}
+
+/// A `PortalUserService` over `repository` with its write guard attached: the way to build it, so its writes are
+/// served only with the rules the schema declares.
+pub fn build_portal_user_service(
+    repository: std::sync::Arc<crate::infrastructure::persistence::PortalUserRepository>,
+) -> PortalUserService {
+    PortalUserService::with_repository(repository).with_guard(std::sync::Arc::new(PortalUserRowRules))
+}
+
 // This directory's extension (hand-written; ADR-0031).
 include!("mod.ext.rs");
