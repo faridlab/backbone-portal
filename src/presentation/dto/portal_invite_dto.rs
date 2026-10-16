@@ -38,7 +38,6 @@ pub struct CreatePortalInviteDto {
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(alias = "token_expires_at")]
     pub token_expires_at: DateTime<Utc>,
-    pub status: PortalInviteStatus,
     #[serde(default, skip_serializing_if = "Option::is_none", alias = "granted_by")]
     pub granted_by: Option<Uuid>,
     #[serde(default, skip_serializing_if = "Option::is_none", alias = "redeemed_by")]
@@ -252,7 +251,7 @@ impl From<CreatePortalInviteDto> for PortalInvite {
             recipient_email: dto.recipient_email,
             token_nonce: dto.token_nonce,
             token_expires_at: dto.token_expires_at,
-            status: dto.status,
+            status: PortalInviteStatus::Pending,
             granted_by: dto.granted_by,
             redeemed_by: dto.redeemed_by,
             redeemed_at: dto.redeemed_at,

@@ -33,7 +33,6 @@ pub struct CreatePortalUserDto {
     pub email: String,
     #[serde(default, skip_serializing_if = "Option::is_none", alias = "display_name")]
     pub display_name: Option<String>,
-    pub status: PortalUserStatus,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -311,7 +310,7 @@ impl From<CreatePortalUserDto> for PortalUser {
             id: Uuid::new_v4(),
             email: dto.email,
             display_name: dto.display_name,
-            status: dto.status,
+            status: PortalUserStatus::Invited,
             phone: dto.phone,
             street: dto.street,
             street2: dto.street2,

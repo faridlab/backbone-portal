@@ -38,7 +38,6 @@ pub struct CreatePortalTokenDto {
     #[cfg_attr(feature = "openapi", schema(example = "2024-01-01T00:00:00Z"))]
     #[serde(alias = "token_expires_at")]
     pub token_expires_at: DateTime<Utc>,
-    pub status: PortalTokenStatus,
     #[serde(default, skip_serializing_if = "Option::is_none", alias = "rotated_at")]
     pub rotated_at: Option<DateTime<Utc>>,
     #[serde(default, skip_serializing_if = "Option::is_none", alias = "rotated_to")]
@@ -252,7 +251,7 @@ impl From<CreatePortalTokenDto> for PortalToken {
             user_id: dto.user_id,
             token_nonce: dto.token_nonce,
             token_expires_at: dto.token_expires_at,
-            status: dto.status,
+            status: PortalTokenStatus::Active,
             rotated_at: dto.rotated_at,
             rotated_to: dto.rotated_to,
             revoked_at: dto.revoked_at,
