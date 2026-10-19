@@ -235,6 +235,12 @@ impl backbone_core::PersistentEntity for PortalToken {
     fn write_protected_fields() -> &'static [&'static str] {
         &["token_nonce", "status"]
     }
+    fn references() -> &'static [backbone_core::Reference] {
+        const REFERENCES: &[backbone_core::Reference] = &[
+            backbone_core::Reference::new("user_id", "portal.portal_users", "id"),
+        ];
+        REFERENCES
+    }
     fn entity_id(&self) -> String {
         self.id.to_string()
     }

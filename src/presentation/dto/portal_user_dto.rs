@@ -125,38 +125,38 @@ pub struct PatchPortalUserDto {
     #[cfg_attr(feature = "openapi", schema(example = "example"))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "display_name")]
-    pub display_name: Option<String>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "display_name")]
+    pub display_name: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<PortalUserStatus>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "state_id")]
-    pub state_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "country_id")]
-    pub country_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub vat: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "company_name")]
-    pub company_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "sapiens_user_id")]
-    pub sapiens_user_id: Option<Uuid>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "revoked_at")]
-    pub revoked_at: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "revocation_reason")]
-    pub revocation_reason: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "archived_at")]
-    pub archived_at: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "last_login_at")]
-    pub last_login_at: Option<DateTime<Utc>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub phone: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub street: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub street2: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub city: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "state_id")]
+    pub state_id: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "country_id")]
+    pub country_id: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub zip: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub vat: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "company_name")]
+    pub company_name: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "sapiens_user_id")]
+    pub sapiens_user_id: Option<Option<Uuid>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "revoked_at")]
+    pub revoked_at: Option<Option<DateTime<Utc>>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "revocation_reason")]
+    pub revocation_reason: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "archived_at")]
+    pub archived_at: Option<Option<DateTime<Utc>>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "last_login_at")]
+    pub last_login_at: Option<Option<DateTime<Utc>>>,
 }
 
 impl PatchPortalUserDto {
@@ -384,12 +384,4 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalUserDto> for PortalUser {
         Ok(self)
     }
 }
-
-// =============================================================================
-// Custom DTOs
-// =============================================================================
-
-// Add custom DTOs specific to PortalUser here.
-// This section will be preserved during regeneration.
-// >>> END CUSTOM DTOs
 

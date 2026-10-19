@@ -29,6 +29,7 @@ use crate::domain::entity::AuditMetadata;
 #[serde(rename_all = "camelCase")]
 pub struct CreatePortalSignupPolicyDto {
     #[cfg_attr(feature = "openapi", schema(example = true))]
+    #[serde(default)]
     pub enabled: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
@@ -71,10 +72,10 @@ pub struct PatchPortalSignupPolicyDto {
     #[cfg_attr(feature = "openapi", schema(example = true))]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "updated_by")]
-    pub updated_by: Option<Uuid>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option")]
+    pub note: Option<Option<String>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "updated_by")]
+    pub updated_by: Option<Option<Uuid>>,
 }
 
 impl PatchPortalSignupPolicyDto {
@@ -232,12 +233,4 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalSignupPolicyDto> for PortalSignup
         Ok(self)
     }
 }
-
-// =============================================================================
-// Custom DTOs
-// =============================================================================
-
-// Add custom DTOs specific to PortalSignupPolicy here.
-// This section will be preserved during regeneration.
-// >>> END CUSTOM DTOs
 

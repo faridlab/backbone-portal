@@ -101,16 +101,16 @@ pub struct PatchPortalInviteDto {
     pub token_expires_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<PortalInviteStatus>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "granted_by")]
-    pub granted_by: Option<Uuid>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "redeemed_by")]
-    pub redeemed_by: Option<Uuid>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "redeemed_at")]
-    pub redeemed_at: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "revoked_at")]
-    pub revoked_at: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none", alias = "revocation_reason")]
-    pub revocation_reason: Option<String>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "granted_by")]
+    pub granted_by: Option<Option<Uuid>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "redeemed_by")]
+    pub redeemed_by: Option<Option<Uuid>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "redeemed_at")]
+    pub redeemed_at: Option<Option<DateTime<Utc>>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "revoked_at")]
+    pub revoked_at: Option<Option<DateTime<Utc>>>,
+    #[serde(default, deserialize_with = "crate::presentation::dto::double_option", alias = "revocation_reason")]
+    pub revocation_reason: Option<Option<String>>,
 }
 
 impl PatchPortalInviteDto {
@@ -299,12 +299,4 @@ impl backbone_core::ApplyUpdateDto<UpdatePortalInviteDto> for PortalInvite {
         Ok(self)
     }
 }
-
-// =============================================================================
-// Custom DTOs
-// =============================================================================
-
-// Add custom DTOs specific to PortalInvite here.
-// This section will be preserved during regeneration.
-// >>> END CUSTOM DTOs
 

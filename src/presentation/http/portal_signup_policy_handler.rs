@@ -80,6 +80,13 @@ impl axum::response::IntoResponse for PortalSignupPolicyError {
 // Route Configuration
 // =============================================================================
 
+/// The permissions this entity's generic routes require: `portal_signup_policy:<action>` for `read`, `create`,
+/// `update`, `delete`, `restore` and `purge`, with any rename the schema's `requires:` declares.
+pub fn portal_signup_policy_permissions() -> backbone_core::http::CrudPermissions {
+    backbone_core::http::CrudPermissions::new("portal_signup_policy")
+        .in_module("portal")
+}
+
 /// Create Axum router with all 16 Backbone endpoints for PortalSignupPolicy.
 ///
 /// # Routes
@@ -109,21 +116,23 @@ impl axum::response::IntoResponse for PortalSignupPolicyError {
 /// let router = create_portal_signup_policy_routes(service);
 /// ```
 pub fn create_portal_signup_policy_routes(service: Arc<PortalSignupPolicyService>) -> Router {
-    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::routes(
+    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::routes_guarded(
         service,
         "/portal_signup_policies",
+        portal_signup_policy_permissions(),
     )
 }
 
 /// Create Axum router with only the read (GET) endpoints for PortalSignupPolicy.
 ///
-/// Safe for public, unauthenticated exposure (e.g., reference data).
+/// Each route requires the entity's `read` permission, so it needs an authenticated caller.
 /// Mutations must be served separately via `create_portal_signup_policy_write_routes`,
 /// typically wrapped in an auth middleware layer.
 pub fn create_portal_signup_policy_read_routes(service: Arc<PortalSignupPolicyService>) -> Router {
-    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::read_routes(
+    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::read_routes_guarded(
         service,
         "/portal_signup_policies",
+        portal_signup_policy_permissions(),
     )
 }
 
@@ -139,9 +148,10 @@ pub fn create_portal_signup_policy_read_routes(service: Arc<PortalSignupPolicySe
 /// service (e.g. a command router over its domain engine), serve THAT instead
 /// for any mutation that must respect domain rules.
 pub fn create_portal_signup_policy_write_routes(service: Arc<PortalSignupPolicyService>) -> Router {
-    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::write_routes(
+    BackboneCrudHandler::<PortalSignupPolicyService, PortalSignupPolicy, CreatePortalSignupPolicyDto, UpdatePortalSignupPolicyDto, PortalSignupPolicyResponseDto>::write_routes_guarded(
         service,
         "/portal_signup_policies",
+        portal_signup_policy_permissions(),
     )
 }
 

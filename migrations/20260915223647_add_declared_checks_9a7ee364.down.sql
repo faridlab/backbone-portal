@@ -1,0 +1,38 @@
+-- Down: drop the declared rule constraints for portal module
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_revocation_reason_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_company_name_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_vat_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_zip_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_country_id_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_state_id_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_city_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_street2_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_street_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_phone_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_display_name_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_email_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_users DROP CONSTRAINT IF EXISTS ck_portal_users_email_required__required;
+ALTER TABLE IF EXISTS portal.portal_tokens DROP CONSTRAINT IF EXISTS ck_portal_tokens_revocation_reason_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_tokens DROP CONSTRAINT IF EXISTS ck_portal_tokens_token_nonce_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_tokens DROP CONSTRAINT IF EXISTS ck_portal_tokens_token_nonce_required__required;
+ALTER TABLE IF EXISTS portal.portal_tokens DROP CONSTRAINT IF EXISTS ck_portal_tokens_user_id_required__required;
+DO $$
+BEGIN
+    IF to_regclass('portal.uq_portal_tokens_token_nonce__unique') IS NOT NULL AND to_regclass('portal.idx_portal_tokens_token_nonce') IS NULL THEN
+        ALTER INDEX portal.uq_portal_tokens_token_nonce__unique RENAME TO idx_portal_tokens_token_nonce;
+    END IF;
+END $$;
+
+ALTER TABLE IF EXISTS portal.portal_signup_policies DROP CONSTRAINT IF EXISTS ck_portal_signup_policies_note_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_invites DROP CONSTRAINT IF EXISTS ck_portal_invites_revocation_reason_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_invites DROP CONSTRAINT IF EXISTS ck_portal_invites_token_nonce_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_invites DROP CONSTRAINT IF EXISTS ck_portal_invites_token_nonce_required__required;
+ALTER TABLE IF EXISTS portal.portal_invites DROP CONSTRAINT IF EXISTS ck_portal_invites_recipient_email_max_length__max_length;
+ALTER TABLE IF EXISTS portal.portal_invites DROP CONSTRAINT IF EXISTS ck_portal_invites_recipient_email_required__required;
+DO $$
+BEGIN
+    IF to_regclass('portal.uq_portal_invites_token_nonce__unique') IS NOT NULL AND to_regclass('portal.idx_portal_invites_token_nonce') IS NULL THEN
+        ALTER INDEX portal.uq_portal_invites_token_nonce__unique RENAME TO idx_portal_invites_token_nonce;
+    END IF;
+END $$;
+

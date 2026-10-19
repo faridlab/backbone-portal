@@ -12,10 +12,10 @@ pub mod portal_user_handler;
 
 
 // Re-exports
-pub use portal_invite_handler::{create_portal_invite_routes, create_portal_invite_read_routes, create_portal_invite_write_routes};
-pub use portal_signup_policy_handler::{create_portal_signup_policy_routes, create_portal_signup_policy_read_routes, create_portal_signup_policy_write_routes};
-pub use portal_token_handler::{create_portal_token_routes, create_portal_token_read_routes, create_portal_token_write_routes};
-pub use portal_user_handler::{create_portal_user_routes, create_portal_user_read_routes, create_portal_user_write_routes};
+pub use portal_invite_handler::{create_portal_invite_routes, create_portal_invite_read_routes, create_portal_invite_write_routes, portal_invite_permissions};
+pub use portal_signup_policy_handler::{create_portal_signup_policy_routes, create_portal_signup_policy_read_routes, create_portal_signup_policy_write_routes, portal_signup_policy_permissions};
+pub use portal_token_handler::{create_portal_token_routes, create_portal_token_read_routes, create_portal_token_write_routes, portal_token_permissions};
+pub use portal_user_handler::{create_portal_user_routes, create_portal_user_read_routes, create_portal_user_write_routes, portal_user_permissions};
 
 // This directory's extension (hand-written; ADR-0031).
 include!("mod.ext.rs");
